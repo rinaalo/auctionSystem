@@ -4,42 +4,25 @@ import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.Hashtable;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
 public class Server implements AuctionService {
-    private class Auction {
-        private String auctionType; // this might be an enum
-        // item ids, list of bids
-        private Map<Integer, List<Bid>> itemBids;
-        private Auction(String auctionType) {
-            this.auctionType = auctionType;
-            itemBids = new Hashtable<>();
-        }
-    }
-    private class Bid {
-        private int clientId;
-        private int offer;
-        private Bid(int clientId, int bid) {
-            this.clientId = clientId;
-            this.offer = bid;
-        }
-    }
-    // auction id / auction
-    private Map<Integer, Auction> availableAuctions;
-    // item id / item
+    // auction id, auction
+    private Map<Integer, Auction> auctions;
+    // item id, item
     private Map<Integer, AuctionItem> items;
+    // client id, client
 
-    // temporary auction id 
-    private int tempAuctionId;
-    private int tempItemId;
+    // TODO temporary ids 
+    private int auctionId;
+    private int itemId;
 
     public Server() {
         super();
-        availableAuctions = new Hashtable<>();
+        auctions = new Hashtable<>();
         items = new Hashtable<>();
-        tempAuctionId = 0;
-        tempItemId = 0;
+        auctionId = 0;
+        itemId = 0;
 	}
 
     @Override
@@ -57,23 +40,29 @@ public class Server implements AuctionService {
 
     @Override
     public int generateItemId(int clientId) throws RemoteException {
-        return ++tempItemId;
+        return ++itemId;
     }
 
     @Override
     public int createAuction(String auctionType) throws RemoteException {
         Auction newAuction = new Auction(auctionType);
-        tempAuctionId++;
-        availableAuctions.put(tempAuctionId, newAuction);
-        return tempAuctionId;
+        auctionId++;
+        auctions.put(auctionId, newAuction);
+        return auctionId;
     }
     
     @Override
     public void closeAuction(int auctionId) throws RemoteException {
+        if (auctions.get(auctionId).getOngoing() == false) {
+            System.out.println("This auction is already closed\n");
+            return;
+        }
         // return winner
         // item that is sold
         // highest bid of winner
-        availableAuctions.remove(auctionId);
+        System.out.println("Winner: " + getHighestBid(auctionId).getClientId());
+        auctions.get(auctionId).setOngoing(false);
+        //auctions.remove(auctionId);
     }
     
     @Override
@@ -87,45 +76,55 @@ public class Server implements AuctionService {
 
     @Override
     public void bid(int clientId, int auctionId, int itemId, int bid) throws RemoteException {
-        //availableAuctions.get(auctionId).bids.add(new Bid(itemId, clientId, bid));
-        availableAuctions.get(auctionId).itemBids.get(itemId).add(new Bid(clientId, bid));
+        if(auctions.get(auctionId).getOngoing() == false) {
+            System.out.println("This auction has been closed.\n");
+            return;
+        }
+        auctions.get(auctionId).getItemBids().get(itemId).add(new Bid(clientId, bid));
     }
     
-    public int getHighestBid(int auctionId) {
-        int highestBid = 0;
-        for (Integer itemId : availableAuctions.get(auctionId).itemBids.keySet()) {
-            for (Bid bid : availableAuctions.get(auctionId).itemBids.get(itemId)) {
-                if(highestBid < bid.offer) highestBid = bid.offer;
+    public Bid getHighestBid(int auctionId) {
+        int highestOffer = 0;
+        Bid maxBid = new Bid(-1, 0);
+        for (Integer itemId : auctions.get(auctionId).getItemBids().keySet()) {
+            for (Bid bid : auctions.get(auctionId).getItemBids().get(itemId)) {
+                if(highestOffer < bid.getOffer()) {
+                    highestOffer = bid.getOffer();
+                    maxBid = bid;
+                }
             }
         }
-        return highestBid;
+        return maxBid;
     }
     
     @Override
     public String getAuctions(int clientId) throws RemoteException {
         String ret = "";
-        for (Integer auctionId : availableAuctions.keySet()) {
-            ret += "auction ID: " + auctionId + " highest bid: " + getHighestBid(auctionId) + "\n";
+        for (Integer auctionId : auctions.keySet()) {
+            ret += "auction ID: " + auctionId + " highest bid: " + getHighestBid(auctionId).getOffer() + " ongoing: " + auctions.get(auctionId).getOngoing() + "\n";
         }
         return ret;
     }
 
     @Override
     public void addItemToAuction(int itemId, int reservedPrice, int auctionId, int clientId) throws RemoteException {
+        if(auctions.get(auctionId).getOngoing() == false) {
+            System.out.println("This auction has been closed.\n");
+            return;
+        }
         items.get(itemId).setReservedPrice(reservedPrice);
-        //availableAuctions.get(auctionId).auctionItemIDs.add(itemId);
-        availableAuctions.get(auctionId).itemBids.put(itemId, new LinkedList<>());
-        System.out.println(availableAuctions.get(auctionId).itemBids);
+        auctions.get(auctionId).getItemBids().put(itemId, new LinkedList<>());
+        System.out.println(auctions.get(auctionId).getItemBids());
     }
     
     @Override
     public String getItemsInAuction(int auctionId, int clientId) throws RemoteException {
-        if (availableAuctions.get(auctionId).itemBids.isEmpty()) {
+        if (auctions.get(auctionId).getItemBids().isEmpty()) {
             return "No available items in auction.";
         }
         String ret = "------------------------------------\n";
         ret += "Available items in the auction: \n\n";
-        for (Integer itemId : availableAuctions.get(auctionId).itemBids.keySet()) {
+        for (Integer itemId : auctions.get(auctionId).getItemBids().keySet()) {
             ret += itemDetails(itemId, clientId) + "\n";
         }
         ret += "------------------------------------";
@@ -145,6 +144,4 @@ public class Server implements AuctionService {
 			e.printStackTrace();
 		}
 	}
-
-
 }

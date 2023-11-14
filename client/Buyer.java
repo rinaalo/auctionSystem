@@ -14,7 +14,7 @@ public class Buyer {
         browse
             - shows all the available auctions
         show [auction id]
-            - shows a list of items in an auction
+            - shows a list of items in an auction along with their details
         bid [auction id] [item id] [bid]
                 
         """);
@@ -67,7 +67,5 @@ public class Buyer {
                     break;
             }
         }
-        // browse active auctions with their current highest bid
-        // bid for an item by entering the buyer’s details: name and email address. 
     }
 }

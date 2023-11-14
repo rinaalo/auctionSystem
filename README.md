@@ -1,6 +1,7 @@
 # TODO:
 
 - determine winner
+- create methods that checks whether an id exists, etc (error handling)
 - create id's (currently client id is set to 0 and auction id increments for each created auction)
 - check if a specified item id exists
 - check if a specified auction id exists
