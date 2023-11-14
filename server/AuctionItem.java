@@ -7,17 +7,6 @@ public class AuctionItem implements Serializable{
     private Boolean used;
     private int reservedPrice;
 
-    /*class Bid {
-        int itemId;
-        int clientId;
-        int offer;
-        Bid(int itemId, int clientId, int bid) {
-            this.itemId = itemId;
-            this.clientId = clientId;
-            this.offer = bid;
-        }
-    }*/
-
     public AuctionItem(int itemId, String itemTitle, String itemDescription, Boolean used) {
         this.itemId = itemId;
         this.itemTitle = itemTitle;

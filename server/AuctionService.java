@@ -10,6 +10,7 @@ public interface AuctionService extends Remote{
     public void bid(int clientId, int auctionId, int itemId, int bid) throws RemoteException;
     public String itemDetails(int itemId, int clientId) throws RemoteException;
     public String getAuctions(int clientId) throws RemoteException;
-    public int getHighestBid(int auctionId) throws RemoteException;
+    //public int getHighestBid(int auctionId) throws RemoteException;
     public void addItemToAuction(int itemId, int reservedPrice, int auctionId, int clientId) throws RemoteException;
+    public String getItemsInAuction(int auctionId, int clientId) throws RemoteException;
 }

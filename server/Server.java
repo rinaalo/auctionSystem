@@ -10,11 +10,10 @@ import java.util.Map;
 public class Server implements AuctionService {
     private class Auction {
         private String auctionType; // this might be an enum
+        // item ids, list of bids
         private Map<Integer, List<Bid>> itemBids;
         private Auction(String auctionType) {
             this.auctionType = auctionType;
-            //bids = new LinkedList<>();
-            //auctionItemIDs = new LinkedList<>();
             itemBids = new Hashtable<>();
         }
     }
@@ -93,8 +92,7 @@ public class Server implements AuctionService {
         availableAuctions.get(auctionId).itemBids.get(itemId).add(new Bid(clientId, bid));
     }
     
-    @Override
-    public int getHighestBid(int auctionId) throws RemoteException {
+    public int getHighestBid(int auctionId) {
         int highestBid = 0;
         for (Integer itemId : availableAuctions.get(auctionId).itemBids.keySet()) {
             for (Bid bid : availableAuctions.get(auctionId).itemBids.get(itemId)) {
@@ -119,7 +117,20 @@ public class Server implements AuctionService {
         //availableAuctions.get(auctionId).auctionItemIDs.add(itemId);
         availableAuctions.get(auctionId).itemBids.put(itemId, new LinkedList<>());
         System.out.println(availableAuctions.get(auctionId).itemBids);
-        System.out.println("hey");
+    }
+    
+    @Override
+    public String getItemsInAuction(int auctionId, int clientId) throws RemoteException {
+        if (availableAuctions.get(auctionId).itemBids.isEmpty()) {
+            return "No available items in auction.";
+        }
+        String ret = "------------------------------------";
+        ret += "Available items in the auction: \n\n";
+        for (Integer itemId : availableAuctions.get(auctionId).itemBids.keySet()) {
+            ret += itemDetails(itemId, clientId) + "\n";
+        }
+        ret += "------------------------------------";
+        return ret;
     }
 
 	public static void main(String[] args) {
@@ -135,4 +146,5 @@ public class Server implements AuctionService {
 			e.printStackTrace();
 		}
 	}
+
 }

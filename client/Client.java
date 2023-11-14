@@ -192,6 +192,16 @@ public class Client{
                     }
                     break;
                 case "show":
+                    try {
+                        System.out.println(server.getItemsInAuction(Integer.parseInt(tokens[1]), clientId));
+                    } catch (NumberFormatException e) {
+                        System.err.println("Invalid ID");
+                        e.printStackTrace();
+                        continue;
+                    } catch (RemoteException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
                     break;
                 case "bid":
                     if (tokens.length < 3) {

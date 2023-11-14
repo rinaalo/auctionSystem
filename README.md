@@ -1,10 +1,9 @@
 # TODO:
 
-- bid should belong to item not the other way around????
+- determine winner
 - create id's (currently client id is set to 0 and auction id increments for each created auction)
 - check if a specified item id exists
 - check if a specified auction id exists
-- determine winner
 - add strating price
 - reserved price is lower that the starting price (to keep the profit secured)
 
