@@ -32,12 +32,14 @@ public class Server implements AuctionService {
 
     // temporary auction id 
     private int tempAuctionId;
+    private int tempItemId;
 
     public Server() {
         super();
         availableAuctions = new Hashtable<>();
         items = new Hashtable<>();
         tempAuctionId = 0;
+        tempItemId = 0;
 	}
 
     @Override
@@ -54,11 +56,8 @@ public class Server implements AuctionService {
     }
 
     @Override
-    public void addDescription(int itemId, int clientId, String description) throws RemoteException {
-        if (getSpec(itemId, clientId) == null) {
-            return;
-        }
-        getSpec(itemId, clientId).setItemDescription(description);
+    public int generateItemId(int clientId) throws RemoteException {
+        return ++tempItemId;
     }
 
     @Override
@@ -82,8 +81,8 @@ public class Server implements AuctionService {
         return ("ITEM DETAILS" +
         "\nitem id: " + getSpec(itemId, clientId).getItemId() + " " + 
         "\nitem title: " + getSpec(itemId, clientId).getItemTitle() + " " + 
-        "\nitem description: " + getSpec(itemId, clientId).getItemDescription() + " " + 
-        "\nused: " + getSpec(itemId, clientId).getCondition() + "\n");
+        "\nused: " + getSpec(itemId, clientId).getCondition() + " " +
+        "\nitem description: " + getSpec(itemId, clientId).getItemDescription() + "\n");
     }
 
     @Override
@@ -124,7 +123,7 @@ public class Server implements AuctionService {
         if (availableAuctions.get(auctionId).itemBids.isEmpty()) {
             return "No available items in auction.";
         }
-        String ret = "------------------------------------";
+        String ret = "------------------------------------\n";
         ret += "Available items in the auction: \n\n";
         for (Integer itemId : availableAuctions.get(auctionId).itemBids.keySet()) {
             ret += itemDetails(itemId, clientId) + "\n";
@@ -146,5 +145,6 @@ public class Server implements AuctionService {
 			e.printStackTrace();
 		}
 	}
+
 
 }

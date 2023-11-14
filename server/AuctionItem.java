@@ -3,15 +3,15 @@ import java.io.Serializable;
 public class AuctionItem implements Serializable{
     private int itemId;
     private String itemTitle;
-    private String itemDescription;
     private Boolean used;
+    private String itemDescription;
     private int reservedPrice;
 
-    public AuctionItem(int itemId, String itemTitle, String itemDescription, Boolean used) {
+    public AuctionItem(int itemId, String itemTitle, Boolean used, String itemDescription) {
         this.itemId = itemId;
         this.itemTitle = itemTitle;
-        this.itemDescription = itemDescription;
         this.used = used;
+        this.itemDescription = itemDescription;
     }
     
     // get methods
@@ -21,11 +21,11 @@ public class AuctionItem implements Serializable{
     public String getItemTitle() {
         return this.itemTitle;
     }
-    public String getItemDescription() {
-        return this.itemDescription;
-    }
     public Boolean getCondition() {
         return this.used;
+    }
+    public String getItemDescription() {
+        return this.itemDescription;
     }
     public int getReservedPrice() {
         return reservedPrice;
