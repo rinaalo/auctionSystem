@@ -12,17 +12,21 @@ public class Server implements AuctionService {
     // item id, item
     private Map<Integer, AuctionItem> items;
     // client id, client
+    private Map<Integer, Client> clients;
 
     // TODO temporary ids 
     private int auctionId;
     private int itemId;
+    private int clientId;
 
     public Server() {
         super();
         auctions = new Hashtable<>();
         items = new Hashtable<>();
+        clients = new Hashtable<>();
         auctionId = 0;
         itemId = 0;
+        clientId = 0;
 	}
 
     @Override
@@ -44,6 +48,18 @@ public class Server implements AuctionService {
     }
 
     @Override
+    public int addClient(String name, String email, ClientType type) throws RemoteException {
+        clientId = generateClientId();
+        Client client = new Client(name, email, clientId, type);
+        clients.put(clientId, client);
+        return clientId;
+    }
+
+    public int generateClientId() {
+        return ++clientId;
+    }
+
+    @Override
     public int createAuction(String auctionType) throws RemoteException {
         Auction newAuction = new Auction(auctionType);
         auctionId++;
@@ -57,12 +73,12 @@ public class Server implements AuctionService {
             System.out.println("This auction is already closed\n");
             return;
         }
-        // return winner
+        // TODO:
+        // return winner details (name - email)
         // item that is sold
         // highest bid of winner
         System.out.println("Winner: " + getHighestBid(auctionId).getClientId());
         auctions.get(auctionId).setOngoing(false);
-        //auctions.remove(auctionId);
     }
     
     @Override

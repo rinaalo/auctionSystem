@@ -11,34 +11,37 @@ public class Seller {
         You are a seller.
         Available prompts:
 
-        add [item title] [item condition] [item description]
+        > help
+            shows all available prompts
+
+        > add [item title] [item condition] [item description]
             adds an item to the system.
-            - the item title can only consist of one word with no spaces in between.
-            - the item condition can be set to true (used), anything else will be considered false (new).
-            - description must be a sentence describing the item
+            the item title can only consist of one word with no spaces in between.
+            the item condition can be set to true (used), anything else will be considered false (new).
+            description must be a sentence describing the item
             EXAMPLE USAGE: add paint true acrylic type
 
-        itemDetails [item id]
+        > itemDetails [item id]
             shows the details of specified item.
-            - item id must belong to an existing item.
+            item id must belong to an existing item.
             EXAMPLE USAGE: itemDetails 102
 
-        createAuction [auction type]
+        > createAuction [auction type]
             starts an auction.
-            - auction type will determine the behaviour of the auction.
-                - available types: (f)orward, (r)everse, (d)ouble
+            auction type will determine the behaviour of the auction.
+                available types: (f)orward, (r)everse, (d)ouble
             EXAMPLE USAGE: createAuction f
 
-        addItemToAuction [item id] [reserved price] [auction id]
+        > addItemToAuction [item id] [reserved price] [auction id]
             adds an item to an auction
-            - item id belongs to the item that will be added to the auction
-            - reserved price is the minimum bid required for the item
-            - auction id belongs to the auction the item will be added to
+            item id belongs to the item that will be added to the auction
+            reserved price is the minimum bid required for the item
+            auction id belongs to the auction the item will be added to
             EXAMPLE USAGE: add 102 500 238
 
-        closeAuction [auction id]
+        > closeAuction [auction id]
             ends the specified auction
-            - auction id must be an ongoing auction's id.
+            auction id must be an ongoing auction's id.
             EXAMPLE USAGE: closeAuction 238
 
         """);
@@ -50,6 +53,9 @@ public class Seller {
             String[] tokens = option.nextLine().split(" ");
             System.out.println();
             switch (tokens[0]) {
+                case "help":
+                    sellerMenu();
+                    break;
                 case "add":
                     if (tokens.length < 4) {
                         System.err.println("Not enough arguments");

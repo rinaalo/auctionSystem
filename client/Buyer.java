@@ -3,7 +3,21 @@ import java.util.Scanner;
 
 public class Buyer {
 
-    private int clientId = 0;
+    private int clientId = -1;
+
+    public void register(Scanner option, AuctionService server) {
+        System.out.println("Register as a buyer by entering your name and email address.");
+        System.out.print("Name: ");
+        String name = option.nextLine();
+        System.out.print("Email: ");
+        String email = option.nextLine();
+        try {
+            clientId = server.addClient(name, email, ClientType.BUYER);
+        } catch (RemoteException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
 
     public void buyerMenu() {
         System.out.println("""
@@ -11,22 +25,34 @@ public class Buyer {
         You are a buyer.
         Available prompts:
 
-        browse
-            - shows all the available auctions
-        show [auction id]
-            - shows a list of items in an auction along with their details
-        bid [auction id] [item id] [bid]
+        > help
+            shows all available prompts
+
+        > browse
+            shows all the available auctions
+
+        > show [auction id]
+            shows a list of items in an auction along with their details
+            EXAMPLE USAGE: show 2313
+            
+        > bid [auction id] [item id] [bid]
+            allows you to bid for an item in a specified auction
+            EXAMPLE USAGE: bid 1234 3421 500
                 
         """);
-        //TODO: IN BID BUYERS NAME AND EMAIL
     }
 
     public void buyerPrompts(Scanner option, AuctionService server) {
+        // TODO:
+        //int clientId = server.
         Boolean inProcess = true;
         while (inProcess) {
             String[] tokens = option.nextLine().split(" ");
             System.out.println();
             switch (tokens[0]) {
+                case "help":
+                    buyerMenu();
+                    break;
                 case "browse":
                     try {
                         System.out.println(server.getAuctions(clientId));

@@ -3,7 +3,7 @@ import java.rmi.registry.Registry;
 import java.util.Scanner;
 
 public class Client{
-    
+
     public static void main(String[] args) {
         System.out.println("=============================");
         System.out.println("-----------WELCOME-----------");
@@ -27,6 +27,7 @@ public class Client{
                 } else if (position.equalsIgnoreCase("b") || position.equalsIgnoreCase("buyer") || position.equals("")) {
                     invalidInput = false; 
                     Buyer b = new Buyer();
+                    b.register(option, server);
                     b.buyerMenu();
                     b.buyerPrompts(option, server);
                 } else {
