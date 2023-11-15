@@ -14,7 +14,7 @@ public class Buyer {
         try {
             clientId = server.addClient(name, email, ClientType.BUYER);
         } catch (RemoteException e) {
-            // TODO Auto-generated catch block
+            System.err.println("Request could not be handled due to network problems.");
             e.printStackTrace();
         }
     }
@@ -57,8 +57,9 @@ public class Buyer {
                     try {
                         System.out.println(server.getAuctions(clientId));
                     } catch (RemoteException e) {
-                        // TODO Auto-generated catch block
+                        System.err.println("Request could not be handled due to network problems.");
                         e.printStackTrace();
+                        continue;
                     }
                     break;
                 case "show":
@@ -69,8 +70,9 @@ public class Buyer {
                         e.printStackTrace();
                         continue;
                     } catch (RemoteException e) {
-                        // TODO Auto-generated catch block
+                        System.err.println("Request could not be handled due to network problems.");
                         e.printStackTrace();
+                        continue;
                     }
                     break;
                 case "bid":
@@ -85,8 +87,9 @@ public class Buyer {
                         e.printStackTrace();
                         continue;
                     } catch (RemoteException e) {
-                        // TODO Auto-generated catch block
+                        System.err.println("Request could not be handled due to network problems.");
                         e.printStackTrace();
+                        continue;
                     }
                     break;
                 default:

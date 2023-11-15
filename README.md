@@ -1,12 +1,8 @@
 # TODO:
-
-- make a distinction between the buyer and seller in server side
-- register buyer (make them type in name and email as soon as b is chosen)
-- determine winner
+- create an account system
+- quit prompt
 - create methods that checks whether an id exists, etc (error handling)
 - create id's (currently client id is set to 0 and auction id increments for each created auction)
-- check if a specified item id exists
-- check if a specified auction id exists
 - add strating price
 - reserved price is lower that the starting price (to keep the profit secured)
 - organise tokens in buyer prompts

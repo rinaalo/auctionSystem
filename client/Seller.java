@@ -5,6 +5,20 @@ public class Seller {
 
     private int clientId = 0;
 
+    public void register(Scanner option, AuctionService server) {
+        System.out.println("Register as a seller by entering your name and email address.");
+        System.out.print("Name: ");
+        String name = option.nextLine();
+        System.out.print("Email: ");
+        String email = option.nextLine();
+        try {
+            clientId = server.addClient(name, email, ClientType.SELLER);
+        } catch (RemoteException e) {
+            System.err.println("Request could not be handled due to network problems.");
+            e.printStackTrace();
+        }
+    }
+
     public void sellerMenu() {
         System.out.println("""
 
@@ -73,8 +87,9 @@ public class Seller {
                         server.addItem(newItem);
                         System.out.println(server.itemDetails(itemId, clientId));
                     } catch (RemoteException e) {
-                        System.err.println("Exception: ");
+                        System.err.println("Request could not be handled due to network problems.");
                         e.printStackTrace();
+                        continue;
                     }
                     break;
                 case "itemDetails":
@@ -90,8 +105,9 @@ public class Seller {
                         e.printStackTrace();
                         continue;
                     } catch (RemoteException e) {
-                        // TODO Auto-generated catch block
+                        System.err.println("Request could not be handled due to network problems.");
                         e.printStackTrace();
+                        continue;
                     }
                     break;
                 case "createAuction":
@@ -101,10 +117,24 @@ public class Seller {
                     }
                     try {
                         String auctionType = tokens[1];
-                        server.createAuction(auctionType);
+                        switch (auctionType.toLowerCase()) {
+                            case "f":
+                                server.createAuction(AuctionType.FORWARD);
+                                break;
+                            case "r":
+                                server.createAuction(AuctionType.REVERSE);
+                                break;
+                            case "d":
+                                server.createAuction(AuctionType.DOUBLE);
+                                break;
+                            default:
+                                System.err.println("Please try again with a valid auction type f, r, d");
+                                break;
+                        }
                     } catch (RemoteException e) {
-                        // TODO Auto-generated catch block
+                        System.err.println("Request could not be handled due to network problems.");
                         e.printStackTrace();
+                        continue;
                     }
                     break;
                 case "addItemToAuction":
@@ -123,8 +153,9 @@ public class Seller {
                         e.printStackTrace();
                         continue;
                     } catch (RemoteException e) {
-                        // TODO Auto-generated catch block
+                        System.err.println("Request could not be handled due to network problems.");
                         e.printStackTrace();
+                        continue;
                     }
                     break;
                 case "closeAuction":
@@ -134,15 +165,15 @@ public class Seller {
                     }
                     try {
                         int auctionId = Integer.parseInt(tokens[1]);
-                        server.closeAuction(auctionId);
-                        // TODO should determine the winner
+                        System.out.println(server.closeAuction(auctionId));
                     } catch (NumberFormatException e) {
                         System.err.println("Invalid ID");
                         e.printStackTrace();
                         continue;
                     } catch (RemoteException e) {
-                        // TODO Auto-generated catch block
+                        System.err.println("Request could not be handled due to network problems.");
                         e.printStackTrace();
+                        continue;
                     }
                     break;
                 default:

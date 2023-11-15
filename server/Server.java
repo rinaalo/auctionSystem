@@ -60,48 +60,70 @@ public class Server implements AuctionService {
     }
 
     @Override
-    public int createAuction(String auctionType) throws RemoteException {
-        Auction newAuction = new Auction(auctionType);
+    public int createAuction(AuctionType type) throws RemoteException {
+        Auction newAuction = new Auction(type);
         auctionId++;
         auctions.put(auctionId, newAuction);
         return auctionId;
     }
     
     @Override
-    public void closeAuction(int auctionId) throws RemoteException {
+    public String closeAuction(int auctionId) throws RemoteException {
+        // if auction has been previously closed.
         if (auctions.get(auctionId).getOngoing() == false) {
-            System.out.println("This auction is already closed\n");
-            return;
+            return "This auction is already closed\n";
         }
-        // TODO:
-        // return winner details (name - email)
-        // item that is sold
-        // highest bid of winner
-        System.out.println("Winner: " + getHighestBid(auctionId).getClientId());
+        Bid bid = getHighestBid(auctionId);
+        int offer = bid.getOffer();
+        int clientId = bid.getClientId();
+        int itemId = bid.getItemId();
         auctions.get(auctionId).setOngoing(false);
+
+        // if no one bid.
+        if (!clients.containsKey(clientId)) {
+            return "Auction is closed.\nThe reserve has not been reached.\n";
+        }
+        String name = clients.get(clientId).getName();
+        String email = clients.get(clientId).getEmail();
+
+        // if offer is less than reserved price.
+        if (offer < items.get(itemId).getReservedPrice()) {
+            return "Auction is closed.\nThe reserve has not been reached.\n";
+        }
+        return "Auction is closed." + "\nWinner: " + name + "\nEmail: " + email + "\nItem ID: " + itemId +"\nBid: " + offer;
     }
     
     @Override
     public String itemDetails(int itemId, int clientId) throws RemoteException {
-        return ("ITEM DETAILS" +
-        "\nitem id: " + getSpec(itemId, clientId).getItemId() + " " + 
-        "\nitem title: " + getSpec(itemId, clientId).getItemTitle() + " " + 
-        "\nused: " + getSpec(itemId, clientId).getCondition() + " " +
-        "\nitem description: " + getSpec(itemId, clientId).getItemDescription() + "\n");
+        if (!items.containsKey(itemId)) {
+            return "Item does not exist.\n";
+        }
+        return (
+        "Item id: " + getSpec(itemId, clientId).getItemId() + "\n" + 
+        "Item title: " + getSpec(itemId, clientId).getItemTitle() + "\n" + 
+        "Used: " + getSpec(itemId, clientId).getCondition() + "\n" +
+        "Item description: " + getSpec(itemId, clientId).getItemDescription() + "\n"
+        );
     }
 
     @Override
-    public void bid(int clientId, int auctionId, int itemId, int bid) throws RemoteException {
-        if(auctions.get(auctionId).getOngoing() == false) {
-            System.out.println("This auction has been closed.\n");
-            return;
+    public String bid(int clientId, int auctionId, int itemId, int bid) throws RemoteException {
+        if(!items.containsKey(itemId)) {
+            return "Item does not exist\n";
         }
-        auctions.get(auctionId).getItemBids().get(itemId).add(new Bid(clientId, bid));
+        if(!auctions.containsKey(auctionId)) {
+            return "Auction does not exist\n";
+        }
+        if(auctions.get(auctionId).getOngoing() == false) {
+            return "This auction is closed.\n";
+        }
+        auctions.get(auctionId).getItemBids().get(itemId).add(new Bid(clientId, itemId, bid));
+        return "You have bid " + bid + "amount for item " + itemId + "in auction " + auctionId + "\n";
     }
     
     public Bid getHighestBid(int auctionId) {
         int highestOffer = 0;
-        Bid maxBid = new Bid(-1, 0);
+        Bid maxBid = new Bid(-1, -1, 0);
         for (Integer itemId : auctions.get(auctionId).getItemBids().keySet()) {
             for (Bid bid : auctions.get(auctionId).getItemBids().get(itemId)) {
                 if(highestOffer < bid.getOffer()) {
@@ -117,20 +139,28 @@ public class Server implements AuctionService {
     public String getAuctions(int clientId) throws RemoteException {
         String ret = "";
         for (Integer auctionId : auctions.keySet()) {
-            ret += "auction ID: " + auctionId + " highest bid: " + getHighestBid(auctionId).getOffer() + " ongoing: " + auctions.get(auctionId).getOngoing() + "\n";
+            ret += "auction ID: " + auctionId + 
+                    "\nhighest bid: " + getHighestBid(auctionId).getOffer() + 
+                    "\ntype: " + auctions.get(auctionId).getAuctionType() + 
+                    "\nongoing: " + auctions.get(auctionId).getOngoing() + "\n";
         }
         return ret;
     }
 
     @Override
-    public void addItemToAuction(int itemId, int reservedPrice, int auctionId, int clientId) throws RemoteException {
+    public String addItemToAuction(int itemId, int reservedPrice, int auctionId, int clientId) throws RemoteException {
+        if(!items.containsKey(itemId)) {
+            return "Item does not exist\n";
+        }
+        if(!auctions.containsKey(auctionId)) {
+            return "Auction does not exist\n";
+        }
         if(auctions.get(auctionId).getOngoing() == false) {
-            System.out.println("This auction has been closed.\n");
-            return;
+            return "This auction has been closed.\n";
         }
         items.get(itemId).setReservedPrice(reservedPrice);
         auctions.get(auctionId).getItemBids().put(itemId, new LinkedList<>());
-        System.out.println(auctions.get(auctionId).getItemBids());
+        return "Item has been added to auction.\n";
     }
     
     @Override

@@ -22,6 +22,7 @@ public class Client{
                 if (position.equalsIgnoreCase("s") || position.equalsIgnoreCase("seller")) {
                     invalidInput = false;
                     Seller s = new Seller();
+                    s.register(option, server);
                     s.sellerMenu();
                     s.sellerPrompts(option, server);
                 } else if (position.equalsIgnoreCase("b") || position.equalsIgnoreCase("buyer") || position.equals("")) {
