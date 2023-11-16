@@ -6,7 +6,9 @@ public interface AuctionService extends Remote{
     public void addItem(AuctionItem item) throws RemoteException; 
     public int generateItemId(int clientId) throws RemoteException; 
     public int addClient(String name, String email, ClientType type) throws RemoteException; 
-    public int createAuction(AuctionType type) throws RemoteException;
+    public int createForwardAuction() throws RemoteException;
+    public int createReverseAuction() throws RemoteException;
+    public int createDoubleAuction() throws RemoteException;
     public String closeAuction(int auctionId) throws RemoteException;
     public String bid(int clientId, int auctionId, int itemId, int bid) throws RemoteException;
     public String itemDetails(int itemId, int clientId) throws RemoteException;

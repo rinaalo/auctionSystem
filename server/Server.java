@@ -40,6 +40,7 @@ public class Server implements AuctionService {
     @Override
     public void addItem(AuctionItem item) throws RemoteException {
         items.put(item.getItemId(), item);
+        System.err.println("item has been added.");
     }
 
     @Override
@@ -52,6 +53,7 @@ public class Server implements AuctionService {
         clientId = generateClientId();
         Client client = new Client(name, email, clientId, type);
         clients.put(clientId, client);
+        System.err.println("client has been added to the system.");
         return clientId;
     }
 
@@ -60,15 +62,41 @@ public class Server implements AuctionService {
     }
 
     @Override
-    public int createAuction(AuctionType type) throws RemoteException {
-        Auction newAuction = new Auction(type);
-        auctionId++;
+    public int createForwardAuction() throws RemoteException {
+        auctionId = generateAuctionId();
+        Auction newAuction = new ForwardAuction(auctionId);
         auctions.put(auctionId, newAuction);
+        System.err.println("Forward Auction has been created.");
         return auctionId;
+    }
+
+    @Override
+    public int createReverseAuction() throws RemoteException {
+        auctionId = generateAuctionId();
+        Auction newAuction = new ReverseAuction(auctionId);
+        auctions.put(auctionId, newAuction);
+        System.err.println("Reverse Auction has been created.");
+        return auctionId;
+    }
+
+    @Override
+    public int createDoubleAuction() throws RemoteException {
+        auctionId = generateAuctionId();
+        Auction newAuction = new DoubleAuction(auctionId);
+        auctions.put(auctionId, newAuction);
+        System.err.println("Double Auction has been created.");
+        return auctionId;
+    }
+
+    public int generateAuctionId() {
+        return ++auctionId;
     }
     
     @Override
     public String closeAuction(int auctionId) throws RemoteException {
+        if(!auctions.containsKey(auctionId)) {
+            return "Auction does not exist.\n";
+        }
         // if auction has been previously closed.
         if (auctions.get(auctionId).getOngoing() == false) {
             return "This auction is already closed\n";
@@ -118,7 +146,7 @@ public class Server implements AuctionService {
             return "This auction is closed.\n";
         }
         auctions.get(auctionId).getItemBids().get(itemId).add(new Bid(clientId, itemId, bid));
-        return "You have bid " + bid + "amount for item " + itemId + "in auction " + auctionId + "\n";
+        return "You have bid the amount of " + bid + " for item " + itemId + " in auction " + auctionId + "\n";
     }
     
     public Bid getHighestBid(int auctionId) {
@@ -159,8 +187,7 @@ public class Server implements AuctionService {
             return "This auction has been closed.\n";
         }
         items.get(itemId).setReservedPrice(reservedPrice);
-        auctions.get(auctionId).getItemBids().put(itemId, new LinkedList<>());
-        return "Item has been added to auction.\n";
+        return auctions.get(auctionId).addItemToAuction(itemId, auctionId, auctions);
     }
     
     @Override

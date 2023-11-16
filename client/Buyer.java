@@ -81,7 +81,7 @@ public class Buyer {
                         continue;
                     }
                     try {
-                        server.bid(clientId, Integer.parseInt(tokens[1]), Integer.parseInt(tokens[2]), Integer.parseInt(tokens[3]));
+                        System.out.println(server.bid(clientId, Integer.parseInt(tokens[1]), Integer.parseInt(tokens[2]), Integer.parseInt(tokens[3])));
                     } catch (NumberFormatException e) {
                         System.err.println("Invalid ID");
                         e.printStackTrace();

@@ -3,8 +3,14 @@ set -xe
 
 rm -rf *.class
 
-javac server/*.java
-cp server/AuctionService.class server/AuctionItem.class server/ClientType.class server/AuctionType.class client
+cd sharedFiles
+javac *.java
+cd ..
+cp sharedFiles/*.class server
+cd server
+javac *.java
+cd ..
+cp sharedFiles/*.class client
 cd client
 javac *.java
 cd ..

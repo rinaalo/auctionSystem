@@ -119,13 +119,13 @@ public class Seller {
                         String auctionType = tokens[1];
                         switch (auctionType.toLowerCase()) {
                             case "f":
-                                server.createAuction(AuctionType.FORWARD);
+                                server.createForwardAuction();
                                 break;
                             case "r":
-                                server.createAuction(AuctionType.REVERSE);
+                                server.createReverseAuction();
                                 break;
                             case "d":
-                                server.createAuction(AuctionType.DOUBLE);
+                                server.createDoubleAuction();
                                 break;
                             default:
                                 System.err.println("Please try again with a valid auction type f, r, d");
@@ -146,8 +146,7 @@ public class Seller {
                         int itemId = Integer.parseInt(tokens[1]);
                         int reservedPrice = Integer.parseInt(tokens[2]);
                         int auctionId = Integer.parseInt(tokens[3]);
-                        server.addItemToAuction(itemId, reservedPrice, auctionId, clientId);
-                        
+                        System.out.println(server.addItemToAuction(itemId, reservedPrice, auctionId, clientId));
                     } catch (NumberFormatException e) {
                         System.err.println("Invalid ID");
                         e.printStackTrace();
