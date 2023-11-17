@@ -1,4 +1,3 @@
-import java.util.LinkedList;
 import java.util.Map;
 
 public class DoubleAuction extends Auction {
@@ -16,8 +15,14 @@ public class DoubleAuction extends Auction {
     @Override
     public String addItemToAuction(int itemId, int auctionId, Map<Integer, Auction> auctions) {
         //TODO: add condition
-        auctions.get(auctionId).getItemBids().put(itemId, new LinkedList<>());
+        auctions.get(auctionId).getAuctionItems().add(itemId);
         return "Item has been added to auction.\n";
+    }
+
+    @Override
+    public String determineWinner(int auctionId) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'determineWinner'");
     }
     
 }

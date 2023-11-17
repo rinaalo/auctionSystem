@@ -1,25 +1,30 @@
-import java.util.Hashtable;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 public abstract class Auction {
     private int auctionId;
     private Boolean ongoing;
-    // item ids, list of bids
-    private Map<Integer, List<Bid>> itemBids;
+    private List<Bid> auctionBids;
+    private List<Integer> auctionItems;
 
     public Auction(int auctionId) {
         this.auctionId = auctionId;
-        this.itemBids = new Hashtable<>();
         this.ongoing = true;
+        this.auctionBids = new LinkedList<>();
+        this.auctionItems = new LinkedList<>();
     }
 
     public Boolean getOngoing() {
         return this.ongoing;
     }
 
-    public Map<Integer, List<Bid>> getItemBids() {
-        return this.itemBids;
+    public List<Bid> getAuctionBids() {
+        return this.auctionBids;
+    }
+
+    public List<Integer> getAuctionItems() {
+        return this.auctionItems;
     }
 
     public int getAuctionId() {
@@ -33,5 +38,6 @@ public abstract class Auction {
     public abstract AuctionType getAuctionType();
 
     public abstract String addItemToAuction(int itemId, int auctionId, Map<Integer, Auction> auctions);
-
+    
+    public abstract String determineWinner(int auctionId);
 }

@@ -24,21 +24,27 @@ public class Buyer {
             
         You are a buyer.
         Available prompts:
-
-        > help
+        -----------------------------------------------------
+        - help
             shows all available prompts
-
-        > browse
+        -----------------------------------------------------
+        - browse
             shows all the available auctions
-
-        > show [auction id]
+        -----------------------------------------------------
+        - show [auction id]
             shows a list of items in an auction along with their details
             EXAMPLE USAGE: show 2313
-            
-        > bid [auction id] [item id] [bid]
-            allows you to bid for an item in a specified auction
-            EXAMPLE USAGE: bid 1234 3421 500
-                
+        -----------------------------------------------------        
+        - bid [auction id] [bid]
+            allows you to bid for a specified auction
+            EXAMPLE USAGE: bid 1234 500
+        ----------------------------------------------------- 
+        - createAuction [auction type]
+            starts an auction.
+            available types: (r)everse, (d)ouble
+            EXAMPLE USAGE: createAuction r
+        -----------------------------------------------------
+
         """);
     }
 
@@ -63,6 +69,10 @@ public class Buyer {
                     }
                     break;
                 case "show":
+                    if (tokens.length < 2) {
+                        System.err.println("Not enough arguments");
+                        continue;
+                    }
                     try {
                         System.out.println(server.getItemsInAuction(Integer.parseInt(tokens[1]), clientId));
                     } catch (NumberFormatException e) {
@@ -81,11 +91,35 @@ public class Buyer {
                         continue;
                     }
                     try {
-                        System.out.println(server.bid(clientId, Integer.parseInt(tokens[1]), Integer.parseInt(tokens[2]), Integer.parseInt(tokens[3])));
+                        System.out.println(server.bid(clientId, Integer.parseInt(tokens[1]), Integer.parseInt(tokens[2])));
                     } catch (NumberFormatException e) {
                         System.err.println("Invalid ID");
                         e.printStackTrace();
                         continue;
+                    } catch (RemoteException e) {
+                        System.err.println("Request could not be handled due to network problems.");
+                        e.printStackTrace();
+                        continue;
+                    }
+                    break;
+                case "createAuction":
+                    if (tokens.length < 2) {
+                        System.err.println("Not enough arguments");
+                        continue;
+                    }
+                    try {
+                        String auctionType = tokens[1];
+                        switch (auctionType.toLowerCase()) {
+                            case "r":
+                                server.createReverseAuction();
+                                break;
+                            case "d":
+                                server.createDoubleAuction();
+                                break;
+                            default:
+                                System.err.println("Please try again with a valid auction type r or d");
+                                break;
+                        }
                     } catch (RemoteException e) {
                         System.err.println("Request could not be handled due to network problems.");
                         e.printStackTrace();

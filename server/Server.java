@@ -3,7 +3,6 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.Hashtable;
-import java.util.LinkedList;
 import java.util.Map;
 
 public class Server implements AuctionService {
@@ -14,7 +13,7 @@ public class Server implements AuctionService {
     // client id, client
     private Map<Integer, Client> clients;
 
-    // TODO temporary ids 
+    // TODO temporary ids
     private int auctionId;
     private int itemId;
     private int clientId;
@@ -27,13 +26,10 @@ public class Server implements AuctionService {
         auctionId = 0;
         itemId = 0;
         clientId = 0;
-	}
+    }
 
     @Override
     public AuctionItem getSpec(int itemId, int clientId) throws RemoteException {
-        if (items.get(itemId) == null) {
-            return null;
-        }
         return items.get(itemId);
     }
 
@@ -91,130 +87,159 @@ public class Server implements AuctionService {
     public int generateAuctionId() {
         return ++auctionId;
     }
-    
+
     @Override
     public String closeAuction(int auctionId) throws RemoteException {
-        if(!auctions.containsKey(auctionId)) {
+        if (!auctions.containsKey(auctionId)) {
             return "Auction does not exist.\n";
         }
+        Auction auction = auctions.get(auctionId);
         // if auction has been previously closed.
-        if (auctions.get(auctionId).getOngoing() == false) {
+        if (auction.getOngoing() == false) {
             return "This auction is already closed\n";
         }
-        Bid bid = getHighestBid(auctionId);
+        /*Bid bid = getHighestBid(auctionId);
         int offer = bid.getOffer();
         int clientId = bid.getClientId();
-        int itemId = bid.getItemId();
-        auctions.get(auctionId).setOngoing(false);
+        int itemId = bid.getItemId();*/
+        auction.setOngoing(false);
 
         // if no one bid.
-        if (!clients.containsKey(clientId)) {
+        if (auction.getAuctionBids().isEmpty()) {
             return "Auction is closed.\nThe reserve has not been reached.\n";
         }
-        String name = clients.get(clientId).getName();
+
+        auction.determineWinner(auctionId);
+        /*String name = clients.get(clientId).getName();
         String email = clients.get(clientId).getEmail();
 
         // if offer is less than reserved price.
         if (offer < items.get(itemId).getReservedPrice()) {
             return "Auction is closed.\nThe reserve has not been reached.\n";
         }
-        return "Auction is closed." + "\nWinner: " + name + "\nEmail: " + email + "\nItem ID: " + itemId +"\nBid: " + offer;
+        return "Auction is closed." +
+                "\nWinner: " + name +
+                "\nEmail: " + email +
+                "\nItem ID: " + itemId +
+                "\nBid: " + offer;*/
+        return null;
     }
-    
+
     @Override
     public String itemDetails(int itemId, int clientId) throws RemoteException {
         if (!items.containsKey(itemId)) {
             return "Item does not exist.\n";
         }
-        return (
-        "Item id: " + getSpec(itemId, clientId).getItemId() + "\n" + 
-        "Item title: " + getSpec(itemId, clientId).getItemTitle() + "\n" + 
-        "Used: " + getSpec(itemId, clientId).getCondition() + "\n" +
-        "Item description: " + getSpec(itemId, clientId).getItemDescription() + "\n"
-        );
+        AuctionItem item = items.get(itemId);
+        String startingPrice;
+        if (!item.getInAuction()) {
+            startingPrice = "";
+        } else
+            startingPrice = "Starting price: " + Integer.toString(item.getStartingPrice()) + "\n";
+
+        return ("Item id: " + item.getItemId() + "\n" +
+                "Item title: " + item.getItemTitle() + "\n" +
+                "Used: " + item.getCondition() + "\n" +
+                "Item description: " + item.getItemDescription() + "\n" +
+                startingPrice);
     }
 
     @Override
-    public String bid(int clientId, int auctionId, int itemId, int bid) throws RemoteException {
-        if(!items.containsKey(itemId)) {
-            return "Item does not exist\n";
+    public String bid(int clientId, int auctionId, int bid) throws RemoteException {
+        if (!auctions.containsKey(auctionId)) {
+            return "Auction does not exist.\n";
         }
-        if(!auctions.containsKey(auctionId)) {
-            return "Auction does not exist\n";
+        Auction auction = auctions.get(auctionId);
+        if (auction.getAuctionItems().isEmpty()) {
+            return "No available items in the auction.\n";
         }
-        if(auctions.get(auctionId).getOngoing() == false) {
+        if (auction.getOngoing() == false) {
             return "This auction is closed.\n";
         }
-        auctions.get(auctionId).getItemBids().get(itemId).add(new Bid(clientId, itemId, bid));
-        return "You have bid the amount of " + bid + " for item " + itemId + " in auction " + auctionId + "\n";
+        //TODO: check if it is less than the MINIMUM starting price out of all items in the auction
+        /*if (bid < items.get(itemId).getStartingPrice()) {
+            return "Your bid has to be greater than the starting price.\n";
+        }*/
+        auction.getAuctionBids().add(new Bid(clientId, bid));
+        return "You have bid the amount of " + bid + " in auction " + auctionId + "\n";
     }
-    
+
     public Bid getHighestBid(int auctionId) {
         int highestOffer = 0;
-        Bid maxBid = new Bid(-1, -1, 0);
-        for (Integer itemId : auctions.get(auctionId).getItemBids().keySet()) {
-            for (Bid bid : auctions.get(auctionId).getItemBids().get(itemId)) {
-                if(highestOffer < bid.getOffer()) {
-                    highestOffer = bid.getOffer();
-                    maxBid = bid;
-                }
+        Bid maxBid = new Bid(-1, 0);
+        for (Bid bid : auctions.get(auctionId).getAuctionBids()) {
+            if (highestOffer < bid.getOffer()) {
+                highestOffer = bid.getOffer();
+                maxBid = bid;
             }
         }
         return maxBid;
     }
-    
+
     @Override
     public String getAuctions(int clientId) throws RemoteException {
+        if (auctions.isEmpty()) {
+            return "No available auctions.\n";
+        }
         String ret = "";
         for (Integer auctionId : auctions.keySet()) {
-            ret += "auction ID: " + auctionId + 
-                    "\nhighest bid: " + getHighestBid(auctionId).getOffer() + 
-                    "\ntype: " + auctions.get(auctionId).getAuctionType() + 
+            ret += "\nauction ID: " + auctionId +
+                    "\nhighest bid: " + getHighestBid(auctionId).getOffer() +
+                    "\ntype: " + auctions.get(auctionId).getAuctionType() +
                     "\nongoing: " + auctions.get(auctionId).getOngoing() + "\n";
         }
         return ret;
     }
 
     @Override
-    public String addItemToAuction(int itemId, int reservedPrice, int auctionId, int clientId) throws RemoteException {
-        if(!items.containsKey(itemId)) {
+    public String addItemToAuction(int itemId, int auctionId, int reservedPrice, int startingPrice, int clientId) throws RemoteException {
+        if (!items.containsKey(itemId)) {
             return "Item does not exist\n";
         }
-        if(!auctions.containsKey(auctionId)) {
+        if (!auctions.containsKey(auctionId)) {
             return "Auction does not exist\n";
         }
-        if(auctions.get(auctionId).getOngoing() == false) {
+        Auction auction = auctions.get(auctionId);
+        AuctionItem item = items.get(itemId);
+        if (auctions.get(auctionId).getOngoing() == false) {
             return "This auction has been closed.\n";
         }
-        items.get(itemId).setReservedPrice(reservedPrice);
-        return auctions.get(auctionId).addItemToAuction(itemId, auctionId, auctions);
+        if (item.getInAuction()) {
+            return "This item is already in an auction.\n";
+        }
+        item.setReservedPrice(reservedPrice);
+        item.setStartingPrice(startingPrice);
+        item.setInAuction(true);
+        return auction.addItemToAuction(itemId, auctionId, auctions);
     }
-    
+
     @Override
     public String getItemsInAuction(int auctionId, int clientId) throws RemoteException {
-        if (auctions.get(auctionId).getItemBids().isEmpty()) {
-            return "No available items in auction.";
+        if (!auctions.containsKey(auctionId)) {
+            return "Auction does not exist\n";
         }
-        String ret = "------------------------------------\n";
-        ret += "Available items in the auction: \n\n";
-        for (Integer itemId : auctions.get(auctionId).getItemBids().keySet()) {
+        Auction auction = auctions.get(auctionId);
+        if (auction.getAuctionItems().isEmpty()) {
+            return "No available items in auction.\n";
+        }
+        String ret = "\nAvailable items in the auction: \n\n";
+        for (Integer itemId : auction.getAuctionItems()) {
             ret += itemDetails(itemId, clientId) + "\n";
         }
-        ret += "------------------------------------";
         return ret;
     }
 
-	public static void main(String[] args) {
-		try {
-			Server s = new Server();
-			String name = "myserver";
-			AuctionService stub = (AuctionService) UnicastRemoteObject.exportObject(s, 0);
-			Registry registry = LocateRegistry.getRegistry();
-			registry.rebind(name, stub);
-			System.out.println("Server ready");
-		} catch (Exception e) {
-			System.err.println("Exception:");
-			e.printStackTrace();
-		}
-	}
+    public static void main(String[] args) {
+        try {
+            Server s = new Server();
+            String name = "myserver";
+            AuctionService stub = (AuctionService) UnicastRemoteObject.exportObject(s, 0);
+            Registry registry = LocateRegistry.getRegistry();
+            registry.rebind(name, stub);
+            System.out.println("Server ready");
+        } catch (Exception e) {
+            System.err.println("Exception:");
+            e.printStackTrace();
+        }
+    }
 }

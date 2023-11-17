@@ -24,39 +24,38 @@ public class Seller {
 
         You are a seller.
         Available prompts:
-
-        > help
+        -----------------------------------------------------
+        - help
             shows all available prompts
-
-        > add [item title] [item condition] [item description]
+        -----------------------------------------------------
+        - add [item title] [item condition] [item description]
             adds an item to the system.
             the item title can only consist of one word with no spaces in between.
-            the item condition can be set to true (used), anything else will be considered false (new).
+            the item condition can be set to true (used),
+            anything else will be considered false (new).
             description must be a sentence describing the item
             EXAMPLE USAGE: add paint true acrylic type
-
-        > itemDetails [item id]
+        -----------------------------------------------------
+        - itemDetails [item id]
             shows the details of specified item.
-            item id must belong to an existing item.
-            EXAMPLE USAGE: itemDetails 102
-
-        > createAuction [auction type]
+            EXAMPLE USAGE: itemDetails 1234
+        -----------------------------------------------------
+        - createAuction [auction type]
             starts an auction.
-            auction type will determine the behaviour of the auction.
-                available types: (f)orward, (r)everse, (d)ouble
+            available types: (f)orward, (d)ouble
             EXAMPLE USAGE: createAuction f
-
-        > addItemToAuction [item id] [reserved price] [auction id]
+        -----------------------------------------------------
+        - addItemToAuction [item id] [auction id] [reserved price] [starting price]
             adds an item to an auction
-            item id belongs to the item that will be added to the auction
-            reserved price is the minimum bid required for the item
-            auction id belongs to the auction the item will be added to
-            EXAMPLE USAGE: add 102 500 238
-
-        > closeAuction [auction id]
+            reserved price is the minimum bid required for the item to be sold.
+            starting price is the minimum amount the bidder is allowed to offer.
+            EXAMPLE USAGE: add 1234 5678 100 50
+        -----------------------------------------------------
+        - closeAuction [auction id]
             ends the specified auction
             auction id must be an ongoing auction's id.
             EXAMPLE USAGE: closeAuction 238
+        -----------------------------------------------------
 
         """);
     }
@@ -121,14 +120,11 @@ public class Seller {
                             case "f":
                                 server.createForwardAuction();
                                 break;
-                            case "r":
-                                server.createReverseAuction();
-                                break;
                             case "d":
                                 server.createDoubleAuction();
                                 break;
                             default:
-                                System.err.println("Please try again with a valid auction type f, r, d");
+                                System.err.println("Please try again with a valid auction type f or d");
                                 break;
                         }
                     } catch (RemoteException e) {
@@ -138,15 +134,20 @@ public class Seller {
                     }
                     break;
                 case "addItemToAuction":
-                    if (tokens.length < 3) {
+                    if (tokens.length < 5) {
                         System.err.println("Not enough arguments");
                         continue;
                     }
                     try {
                         int itemId = Integer.parseInt(tokens[1]);
-                        int reservedPrice = Integer.parseInt(tokens[2]);
-                        int auctionId = Integer.parseInt(tokens[3]);
-                        System.out.println(server.addItemToAuction(itemId, reservedPrice, auctionId, clientId));
+                        int auctionId = Integer.parseInt(tokens[2]);
+                        int reservedPrice = Integer.parseInt(tokens[3]);
+                        int startingPrice = Integer.parseInt(tokens[4]);
+                        if (startingPrice >= reservedPrice) {
+                            System.out.println("Starting price has to be less than the reserved price.\n");
+                            continue;
+                        }
+                        System.out.println(server.addItemToAuction(itemId, auctionId, reservedPrice, startingPrice, clientId));
                     } catch (NumberFormatException e) {
                         System.err.println("Invalid ID");
                         e.printStackTrace();
