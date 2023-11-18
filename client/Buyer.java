@@ -1,10 +1,11 @@
 import java.rmi.RemoteException;
 import java.util.Scanner;
 
-public class Buyer {
+public class Buyer extends ClientManagement {
 
     private int clientId = -1;
 
+    @Override
     public void register(Scanner option, AuctionService server) {
         System.out.println("Register as a buyer by entering your name and email address.");
         System.out.print("Name: ");
@@ -18,8 +19,9 @@ public class Buyer {
             e.printStackTrace();
         }
     }
-
-    public void buyerMenu() {
+    
+    @Override
+    public void showMenu() {
         System.out.println("""
             
         You are a buyer.
@@ -48,7 +50,8 @@ public class Buyer {
         """);
     }
 
-    public void buyerPrompts(Scanner option, AuctionService server) {
+    @Override
+    public void prompts(Scanner option, AuctionService server) {
         // TODO:
         //int clientId = server.
         Boolean inProcess = true;
@@ -57,7 +60,7 @@ public class Buyer {
             System.out.println();
             switch (tokens[0]) {
                 case "help":
-                    buyerMenu();
+                    showMenu();
                     break;
                 case "browse":
                     try {

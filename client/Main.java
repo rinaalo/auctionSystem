@@ -2,8 +2,7 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.Scanner;
 
-public class Client{
-
+public class Main{
     public static void main(String[] args) {
         System.out.println("=============================");
         System.out.println("-----------WELCOME-----------");
@@ -19,21 +18,20 @@ public class Client{
             Boolean invalidInput = true;
             while(invalidInput) {
                 String position = option.nextLine();
+                ClientManagement c;
                 if (position.equalsIgnoreCase("s") || position.equalsIgnoreCase("seller")) {
                     invalidInput = false;
-                    Seller s = new Seller();
-                    s.register(option, server);
-                    s.sellerMenu();
-                    s.sellerPrompts(option, server);
+                    c = new Seller();
                 } else if (position.equalsIgnoreCase("b") || position.equalsIgnoreCase("buyer") || position.equals("")) {
                     invalidInput = false; 
-                    Buyer b = new Buyer();
-                    b.register(option, server);
-                    b.buyerMenu();
-                    b.buyerPrompts(option, server);
+                    c = new Buyer();
                 } else {
                     System.out.println("Please enter a valid position: (s)eller or (b)buyer");
+                    continue;
                 }
+                c.register(option, server);
+                c.showMenu();
+                c.prompts(option, server);
             }
         }
         catch (Exception e) {
