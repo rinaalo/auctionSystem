@@ -90,90 +90,94 @@ public class Server implements AuctionService {
 
     @Override
     public String closeAuction(int auctionId) throws RemoteException {
+        // FAIL
         if (!auctions.containsKey(auctionId)) {
             return "Auction does not exist.\n";
         }
         Auction auction = auctions.get(auctionId);
-        // if auction has been previously closed.
         if (auction.getOngoing() == false) {
             return "This auction is already closed\n";
         }
-        /*Bid bid = getHighestBid(auctionId);
-        int offer = bid.getOffer();
-        int clientId = bid.getClientId();
-        int itemId = bid.getItemId();*/
+        // SUCCESS
         auction.setOngoing(false);
-
         // if no one bid.
         if (auction.getAuctionBids().isEmpty()) {
             return "Auction is closed.\nThe reserve has not been reached.\n";
         }
-
-        auction.determineWinner(auctionId);
-        /*String name = clients.get(clientId).getName();
-        String email = clients.get(clientId).getEmail();
-
-        // if offer is less than reserved price.
-        if (offer < items.get(itemId).getReservedPrice()) {
-            return "Auction is closed.\nThe reserve has not been reached.\n";
-        }
-        return "Auction is closed." +
-                "\nWinner: " + name +
-                "\nEmail: " + email +
-                "\nItem ID: " + itemId +
-                "\nBid: " + offer;*/
+        auction.determineWinner(auctionId, auctions);
+        /*
+         * String name = clients.get(clientId).getName();
+         * String email = clients.get(clientId).getEmail();
+         * 
+         * // if offer is less than reserved price.
+         * if (offer < items.get(itemId).getReservedPrice()) {
+         * return "Auction is closed.\nThe reserve has not been reached.\n";
+         * }
+         * return "Auction is closed." +
+         * "\nWinner: " + name +
+         * "\nEmail: " + email +
+         * "\nItem ID: " + itemId +
+         * "\nBid: " + offer;
+         */
         return null;
     }
 
     @Override
     public String itemDetails(int itemId, int clientId) throws RemoteException {
         if (!items.containsKey(itemId)) {
-            return "Item does not exist.\n";
+            return "Item " + itemId + " does not exist.\n";
         }
         AuctionItem item = items.get(itemId);
-        String startingPrice;
-        if (!item.getInAuction()) {
-            startingPrice = "";
-        } else
-            startingPrice = "Starting price: " + Integer.toString(item.getStartingPrice()) + "\n";
-
-        return ("Item id: " + item.getItemId() + "\n" +
-                "Item title: " + item.getItemTitle() + "\n" +
-                "Used: " + item.getCondition() + "\n" +
-                "Item description: " + item.getItemDescription() + "\n" +
-                startingPrice);
+        return item.printItemDetails();
     }
 
     @Override
     public String bid(int clientId, int auctionId, int bid) throws RemoteException {
         if (!auctions.containsKey(auctionId)) {
-            return "Auction does not exist.\n";
+            return "Auction " + auctionId + " does not exist.\n";
         }
         Auction auction = auctions.get(auctionId);
-        if (auction.getAuctionItems().isEmpty()) {
-            return "No available items in the auction.\n";
+        if (auction.noItemsInAuction()) {
+            return "No available items in auction " + auctionId + ".\n";
         }
         if (auction.getOngoing() == false) {
-            return "This auction is closed.\n";
+            return "Auction " + auctionId + " is closed.\n";
         }
-        //TODO: check if it is less than the MINIMUM starting price out of all items in the auction
-        /*if (bid < items.get(itemId).getStartingPrice()) {
-            return "Your bid has to be greater than the starting price.\n";
-        }*/
+        // TODO: check if it is less than the MINIMUM starting price out of all items in
+        // the auction
+        /*
+         * if (bid < items.get(itemId).getStartingPrice()) {
+         * return "Your bid has to be greater than the starting price.\n";
+         * }
+         */
         auction.getAuctionBids().add(new Bid(clientId, bid));
         return "You have bid the amount of " + bid + " in auction " + auctionId + "\n";
     }
 
-    public Bid getHighestBid(int auctionId) {
-        int highestOffer = 0;
-        Bid maxBid = new Bid(-1, 0);
-        for (Bid bid : auctions.get(auctionId).getAuctionBids()) {
-            if (highestOffer < bid.getOffer()) {
-                highestOffer = bid.getOffer();
-                maxBid = bid;
-            }
+    @Override
+    public String addItemToAuction(int itemId, int auctionId, int reservedPrice, int startingPrice, int clientId)
+            throws RemoteException {
+        if (!items.containsKey(itemId)) {
+            return "Item " + itemId + " does not exist\n";
         }
-        return maxBid;
+        if (!auctions.containsKey(auctionId)) {
+            return "Auction " + auctionId + " does not exist\n";
+        }
+        Auction auction = auctions.get(auctionId);
+        AuctionItem item = items.get(itemId);
+        if (auctions.get(auctionId).getOngoing() == false) {
+            return "Auction " + auctionId + " has been closed.\n";
+        }
+        if (item.getInAuction()) {
+            return "Item " + itemId + " is already in an auction.\n";
+        }
+        if (startingPrice >= reservedPrice) {
+            return "Starting price has to be less than the reserved price.\n";
+        }
+        item.setReservedPrice(reservedPrice);
+        item.setStartingPrice(startingPrice);
+        item.setInAuction(true);
+        return auction.addItemToAuction(item, auctionId, auctions);
     }
 
     @Override
@@ -181,52 +185,33 @@ public class Server implements AuctionService {
         if (auctions.isEmpty()) {
             return "No available auctions.\n";
         }
-        String ret = "";
+        String ret = "\nAll auctions:\n\n";
         for (Integer auctionId : auctions.keySet()) {
+            Auction auction = auctions.get(auctionId);
+            String highestBid = "";
+            if (auction.getHighestBid() == null) {
+                highestBid = "No bid has been made yet.";
+            } else {
+                highestBid += auction.getHighestBid().getOffer();
+            }
             ret += "auction ID: " + auctionId +
-                    "\nhighest bid: " + getHighestBid(auctionId).getOffer() +
-                    "\ntype: " + auctions.get(auctionId).getAuctionType() +
-                    "\nongoing: " + auctions.get(auctionId).getOngoing() + "\n";
+                    "\nhighest bid: " + highestBid +
+                    "\ntype: " + auction.getAuctionType() +
+                    "\nongoing: " + auction.getOngoing() + "\n\n";
         }
         return ret;
-    }
-
-    @Override
-    public String addItemToAuction(int itemId, int auctionId, int reservedPrice, int startingPrice, int clientId) throws RemoteException {
-        if (!items.containsKey(itemId)) {
-            return "Item does not exist\n";
-        }
-        if (!auctions.containsKey(auctionId)) {
-            return "Auction does not exist\n";
-        }
-        Auction auction = auctions.get(auctionId);
-        AuctionItem item = items.get(itemId);
-        if (auctions.get(auctionId).getOngoing() == false) {
-            return "This auction has been closed.\n";
-        }
-        if (item.getInAuction()) {
-            return "This item is already in an auction.\n";
-        }
-        item.setReservedPrice(reservedPrice);
-        item.setStartingPrice(startingPrice);
-        item.setInAuction(true);
-        return auction.addItemToAuction(itemId, auctionId, auctions);
     }
 
     @Override
     public String getItemsInAuction(int auctionId, int clientId) throws RemoteException {
         if (!auctions.containsKey(auctionId)) {
-            return "Auction does not exist\n";
+            return "Auction " + auctionId + " does not exist.\n";
         }
         Auction auction = auctions.get(auctionId);
-        if (auction.getAuctionItems().isEmpty()) {
-            return "No available items in auction.\n";
+        if (auction.noItemsInAuction()) {
+            return "No items in auction " + auctionId + ".\n";
         }
-        String ret = "\nAvailable items in the auction: \n\n";
-        for (Integer itemId : auction.getAuctionItems()) {
-            ret += itemDetails(itemId, clientId) + "\n";
-        }
-        return ret;
+        return auction.printItemsInAuction();
     }
 
     public static void main(String[] args) {

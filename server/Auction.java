@@ -6,13 +6,11 @@ public abstract class Auction {
     private int auctionId;
     private Boolean ongoing;
     private List<Bid> auctionBids;
-    private List<Integer> auctionItems;
 
     public Auction(int auctionId) {
         this.auctionId = auctionId;
         this.ongoing = true;
         this.auctionBids = new LinkedList<>();
-        this.auctionItems = new LinkedList<>();
     }
 
     public Boolean getOngoing() {
@@ -23,10 +21,6 @@ public abstract class Auction {
         return this.auctionBids;
     }
 
-    public List<Integer> getAuctionItems() {
-        return this.auctionItems;
-    }
-
     public int getAuctionId() {
         return this.auctionId;
     }
@@ -35,9 +29,30 @@ public abstract class Auction {
         this.ongoing = status;
     }
 
-    public abstract AuctionType getAuctionType();
+    public Bid getHighestBid() {
+        if(auctionBids.isEmpty()) {
+            return null;
+        }
+        int highestOffer = 0;
+        Bid maxBid = auctionBids.get(0);
+        for (Bid bid : auctionBids) {
+            if (highestOffer < bid.getOffer()) {
+                highestOffer = bid.getOffer();
+                maxBid = bid;
+            }
+        }
+        return maxBid;
+    }
 
-    public abstract String addItemToAuction(int itemId, int auctionId, Map<Integer, Auction> auctions);
+    public abstract AuctionType getAuctionType();
     
-    public abstract String determineWinner(int auctionId);
+    public abstract Boolean noItemsInAuction();
+    
+    public abstract String printItemsInAuction();
+
+    public abstract String addItemToAuction(AuctionItem item, int auctionId, Map<Integer, Auction> auctions);
+
+    public abstract String bid();
+    
+    public abstract String determineWinner(int auctionId, Map<Integer, Auction> auctions);
 }

@@ -1,7 +1,7 @@
 #!/bin/bash
 set -xe
 
-rm -rf *.class
+rm -f */*.class
 
 cd sharedFiles
 javac *.java

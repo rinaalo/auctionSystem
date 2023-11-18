@@ -25,30 +25,36 @@ public class Buyer extends ClientManagement {
         
         You are a buyer.
         Available prompts:
-        -----------------------------------------------------
-        - help
+        =========================================
+        help
+        - - - - - - - - - - - - - - - - - - - - -
             shows all available prompts
-        -----------------------------------------------------
-        - browse
+        =========================================
+        browse
+        - - - - - - - - - - - - - - - - - - - - -
             shows all the available auctions
-        -----------------------------------------------------
-        - show [auction id]
+        =========================================
+        show [auction id]
+        - - - - - - - - - - - - - - - - - - - - -
             shows a list of items in an auction along with their details
             EXAMPLE USAGE: show 2313
-        -----------------------------------------------------        
-        - bid [auction id] [bid]
+        =========================================
+        bid [auction id] [bid]
+        - - - - - - - - - - - - - - - - - - - - -
             allows you to bid for a specified auction
             EXAMPLE USAGE: bid 1234 500
-        ----------------------------------------------------- 
-        - createAuction [auction type]
+        =========================================
+        createAuction [auction type]
+        - - - - - - - - - - - - - - - - - - - - -
             starts an auction.
             available types: (r)everse, (d)ouble
             EXAMPLE USAGE: createAuction r
-        -----------------------------------------------------
-        - closeAuction [auction id]
+        =========================================
+        closeAuction [auction id]
+        - - - - - - - - - - - - - - - - - - - - -
             ends the specified auction
             EXAMPLE USAGE: closeAuction 238
-        -----------------------------------------------------
+        =========================================
         """);
     }
 

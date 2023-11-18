@@ -14,7 +14,7 @@ public class AuctionItem implements Serializable {
         this.itemTitle = itemTitle;
         this.used = used;
         this.itemDescription = itemDescription;
-        this.inAuction = false;
+        inAuction = false;
     }
 
     // get methods
@@ -45,17 +45,31 @@ public class AuctionItem implements Serializable {
     public Boolean getInAuction() {
         return inAuction;
     }
-    
+
     // set methods
     public void setReservedPrice(int reservedPrice) {
         this.reservedPrice = reservedPrice;
     }
-
+    
     public void setStartingPrice(int startingPrice) {
         this.startingPrice = startingPrice;
     }
-
+    
     public void setInAuction(Boolean inAuction) {
         this.inAuction = inAuction;
+    }
+
+    public String printItemDetails() {
+        String price;
+        if (!inAuction) {
+            price = "";
+        } else {
+            price = "Starting price: " + startingPrice + "\n";
+        }
+        return ("Item id: " + itemId + "\n" +
+                "Item title: " + itemTitle + "\n" +
+                "Used: " + used + "\n" +
+                "Item description: " + itemDescription + "\n" +
+                price);
     }
 }

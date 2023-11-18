@@ -25,37 +25,43 @@ public class Seller extends ClientManagement {
 
         You are a seller.
         Available prompts:
-        -----------------------------------------------------
-        - help
+        =========================================
+        help
+        - - - - - - - - - - - - - - - - - - - - -
             shows all available prompts
-        -----------------------------------------------------
-        - add [item title] [item condition] [item description]
+        =========================================
+        add [item title] [item condition] [item description]
+        - - - - - - - - - - - - - - - - - - - - -
             adds an item to the system.
             the item title can only consist of one word with no spaces in between.
             the item condition can be set to true (used),
             anything else will be considered false (new).
             description must be a sentence describing the item
             EXAMPLE USAGE: add paint true acrylic type
-        -----------------------------------------------------
-        - itemDetails [item id]
+        =========================================
+        itemDetails [item id]
+        - - - - - - - - - - - - - - - - - - - - -
             shows the details of specified item.
             EXAMPLE USAGE: itemDetails 1234
-        -----------------------------------------------------
-        - createAuction [auction type]
+        =========================================
+        createAuction [auction type]
+        - - - - - - - - - - - - - - - - - - - - -
             starts an auction.
             available types: (f)orward, (d)ouble
             EXAMPLE USAGE: createAuction f
-        -----------------------------------------------------
-        - addItemToAuction [item id] [auction id] [reserved price] [starting price]
+        =========================================
+        addItemToAuction [item id] [auction id] [reserved price] [starting price]
+        - - - - - - - - - - - - - - - - - - - - -
             adds an item to an auction
             reserved price is the minimum bid required for the item to be sold.
             starting price is the minimum amount the bidder is allowed to offer.
             EXAMPLE USAGE: add 1234 5678 100 50
-        -----------------------------------------------------
-        - closeAuction [auction id]
+        =========================================
+        closeAuction [auction id]
+        - - - - - - - - - - - - - - - - - - - - -
             ends the specified auction
             EXAMPLE USAGE: closeAuction 238
-        -----------------------------------------------------
+        =========================================
         """);
     }
 
@@ -143,10 +149,6 @@ public class Seller extends ClientManagement {
                         int auctionId = Integer.parseInt(tokens[2]);
                         int reservedPrice = Integer.parseInt(tokens[3]);
                         int startingPrice = Integer.parseInt(tokens[4]);
-                        if (startingPrice >= reservedPrice) {
-                            System.out.println("Starting price has to be less than the reserved price.\n");
-                            continue;
-                        }
                         clear();
                         System.out.println(server.addItemToAuction(itemId, auctionId, reservedPrice, startingPrice, clientId));
                     } catch (NumberFormatException e) {
