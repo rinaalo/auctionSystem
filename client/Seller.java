@@ -16,7 +16,6 @@ public class Seller extends ClientManagement {
             clientId = server.addClient(name, email, ClientType.SELLER);
         } catch (RemoteException e) {
             System.err.println("Request could not be handled due to network problems.");
-            e.printStackTrace();
         }
     }
 
@@ -55,10 +54,8 @@ public class Seller extends ClientManagement {
         -----------------------------------------------------
         - closeAuction [auction id]
             ends the specified auction
-            auction id must be an ongoing auction's id.
             EXAMPLE USAGE: closeAuction 238
         -----------------------------------------------------
-
         """);
     }
 
@@ -70,7 +67,7 @@ public class Seller extends ClientManagement {
             System.out.println();
             switch (tokens[0]) {
                 case "help":
-                    showMenu();
+                    clear();
                     break;
                 case "add":
                     if (tokens.length < 4) {
@@ -87,10 +84,10 @@ public class Seller extends ClientManagement {
                         }
                         AuctionItem newItem = new AuctionItem(itemId, itemTitle, used, description);
                         server.addItem(newItem);
+                        clear();
                         System.out.println(server.itemDetails(itemId, clientId));
                     } catch (RemoteException e) {
                         System.err.println("Request could not be handled due to network problems.");
-                        e.printStackTrace();
                         continue;
                     }
                     break;
@@ -101,14 +98,13 @@ public class Seller extends ClientManagement {
                     }
                     try {
                         int itemId = Integer.parseInt(tokens[1]);
+                        clear();
                         System.out.println(server.itemDetails(itemId, clientId));
                     } catch (NumberFormatException e) {
                         System.err.println("Invalid ID");
-                        e.printStackTrace();
                         continue;
                     } catch (RemoteException e) {
                         System.err.println("Request could not be handled due to network problems.");
-                        e.printStackTrace();
                         continue;
                     }
                     break;
@@ -121,10 +117,12 @@ public class Seller extends ClientManagement {
                         String auctionType = tokens[1];
                         switch (auctionType.toLowerCase()) {
                             case "f":
-                                server.createForwardAuction();
+                                clear();
+                                System.out.println(server.createForwardAuction());
                                 break;
                             case "d":
-                                server.createDoubleAuction();
+                                clear();
+                                System.out.println(server.createDoubleAuction());
                                 break;
                             default:
                                 System.err.println("Please try again with a valid auction type f or d");
@@ -132,7 +130,6 @@ public class Seller extends ClientManagement {
                         }
                     } catch (RemoteException e) {
                         System.err.println("Request could not be handled due to network problems.");
-                        e.printStackTrace();
                         continue;
                     }
                     break;
@@ -150,14 +147,13 @@ public class Seller extends ClientManagement {
                             System.out.println("Starting price has to be less than the reserved price.\n");
                             continue;
                         }
+                        clear();
                         System.out.println(server.addItemToAuction(itemId, auctionId, reservedPrice, startingPrice, clientId));
                     } catch (NumberFormatException e) {
                         System.err.println("Invalid ID");
-                        e.printStackTrace();
                         continue;
                     } catch (RemoteException e) {
                         System.err.println("Request could not be handled due to network problems.");
-                        e.printStackTrace();
                         continue;
                     }
                     break;
@@ -168,14 +164,13 @@ public class Seller extends ClientManagement {
                     }
                     try {
                         int auctionId = Integer.parseInt(tokens[1]);
+                        clear();
                         System.out.println(server.closeAuction(auctionId));
                     } catch (NumberFormatException e) {
                         System.err.println("Invalid ID");
-                        e.printStackTrace();
                         continue;
                     } catch (RemoteException e) {
                         System.err.println("Request could not be handled due to network problems.");
-                        e.printStackTrace();
                         continue;
                     }
                     break;

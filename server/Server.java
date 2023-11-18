@@ -58,30 +58,30 @@ public class Server implements AuctionService {
     }
 
     @Override
-    public int createForwardAuction() throws RemoteException {
+    public String createForwardAuction() throws RemoteException {
         auctionId = generateAuctionId();
         Auction newAuction = new ForwardAuction(auctionId);
         auctions.put(auctionId, newAuction);
         System.err.println("Forward Auction has been created.");
-        return auctionId;
+        return "Forward Auction has been created.\nAuction ID: " + auctionId + "\n";
     }
 
     @Override
-    public int createReverseAuction() throws RemoteException {
+    public String createReverseAuction() throws RemoteException {
         auctionId = generateAuctionId();
         Auction newAuction = new ReverseAuction(auctionId);
         auctions.put(auctionId, newAuction);
         System.err.println("Reverse Auction has been created.");
-        return auctionId;
+        return "Reverse Auction has been created.\nAuction ID: " + auctionId + "\n";
     }
 
     @Override
-    public int createDoubleAuction() throws RemoteException {
+    public String createDoubleAuction() throws RemoteException {
         auctionId = generateAuctionId();
         Auction newAuction = new DoubleAuction(auctionId);
         auctions.put(auctionId, newAuction);
         System.err.println("Double Auction has been created.");
-        return auctionId;
+        return "Double Auction has been created.\nAuction ID: " + auctionId + "\n";
     }
 
     public int generateAuctionId() {
@@ -183,7 +183,7 @@ public class Server implements AuctionService {
         }
         String ret = "";
         for (Integer auctionId : auctions.keySet()) {
-            ret += "\nauction ID: " + auctionId +
+            ret += "auction ID: " + auctionId +
                     "\nhighest bid: " + getHighestBid(auctionId).getOffer() +
                     "\ntype: " + auctions.get(auctionId).getAuctionType() +
                     "\nongoing: " + auctions.get(auctionId).getOngoing() + "\n";
