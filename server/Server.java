@@ -8,21 +8,17 @@ import java.util.Map;
 
 public class Server implements AuctionService {
     // auction id, auction
-    private Map<Integer, Auction> auctions;
+    private Map<String, Auction> auctions;
     // item id, item
     private Map<String, AuctionItem> items;
     // client id, client
     private Map<String, RegisteredClient> clients;
-
-    // TODO temporary ids
-    private int auctionId;
 
     public Server() {
         super();
         auctions = new Hashtable<>();
         items = new Hashtable<>();
         clients = new Hashtable<>();
-        auctionId = 0;
     }
 
     @Override
@@ -31,10 +27,11 @@ public class Server implements AuctionService {
     }
 
     @Override
-    public void addItem(AuctionItem item, String clientId) throws RemoteException {
+    public String addItem(AuctionItem item, String clientId) throws RemoteException {
         items.put(item.getItemId(), item);
         clients.get(clientId).addItem(item);
         System.err.println("item has been added.");
+        return "Item has been added. Item details:\n" + itemDetails(item.getItemId(), clientId);
     }
     
     @Override
@@ -55,8 +52,13 @@ public class Server implements AuctionService {
         System.err.println("Encountered error while creating itemID.");
         return "Encountered error while creating itemID.\n";
     }
-    
-    public String showClientsItems(String clientId) throws RemoteException {
+
+    @Override
+    public String showClientsBelongings(String clientId) throws RemoteException {   
+        return showClientsItems(clientId) + "\n" + showClientsAuctions(clientId);
+    }
+
+    public String showClientsItems(String clientId) {
         List<AuctionItem> clientsItems = clients.get(clientId).getItems();
         if (clientsItems.isEmpty()) {
             return "You have no items yet.\n";
@@ -64,6 +66,18 @@ public class Server implements AuctionService {
         String ret = "List of your items:\n\n";
         for (AuctionItem item : clientsItems) {
             ret += itemDetails(item.getItemId(), clientId);
+        }
+        return ret;
+    }
+
+    public String showClientsAuctions(String clientId) {
+        List<Auction> clientsAuctions = clients.get(clientId).getAuctions();
+        if (clientsAuctions.isEmpty()) {
+            return "You have no auctions yet.\n";
+        }
+        String ret = "List of your auctions:\n\n";
+        for (Auction auction : clientsAuctions) {
+            ret += auction.printAuction();
         }
         return ret;
     }
@@ -81,37 +95,54 @@ public class Server implements AuctionService {
 
     @Override
     public String createForwardAuction(String clientId) throws RemoteException {
-        auctionId = generateAuctionId();
+        String auctionId = generateAuctionId();
         Auction newAuction = new ForwardAuction(auctionId, clientId);
         auctions.put(auctionId, newAuction);
+        clients.get(clientId).addAuction(newAuction);
         System.err.println("Forward Auction has been created.");
         return "Forward Auction has been created.\nAuction ID: " + auctionId + "\n";
     }
 
     @Override
     public String createReverseAuction(String clientId) throws RemoteException {
-        auctionId = generateAuctionId();
+        String auctionId = generateAuctionId();
         Auction newAuction = new ReverseAuction(auctionId, clientId);
         auctions.put(auctionId, newAuction);
+        clients.get(clientId).addAuction(newAuction);
         System.err.println("Reverse Auction has been created.");
         return "Reverse Auction has been created.\nAuction ID: " + auctionId + "\n";
     }
 
     @Override
     public String createDoubleAuction(String clientId) throws RemoteException {
-        auctionId = generateAuctionId();
+        String auctionId = generateAuctionId();
         Auction newAuction = new DoubleAuction(auctionId, clientId);
         auctions.put(auctionId, newAuction);
+        clients.get(clientId).addAuction(newAuction);
         System.err.println("Double Auction has been created.");
         return "Double Auction has been created.\nAuction ID: " + auctionId + "\n";
     }
 
-    public int generateAuctionId() {
-        return ++auctionId;
+    public String generateAuctionId() {
+        Boolean unique = false;
+        while (!unique) {
+            String str = java.util.UUID.randomUUID().toString();
+            String auctionId = str.substring(0, 4);
+            if (auctions.isEmpty()) {
+                return auctionId;
+            }
+            if (auctions.containsKey(auctionId)) {
+                continue;
+            } else {
+                return auctionId;
+            }
+        }
+        System.err.println("Encountered error while creating itemID.");
+        return "Encountered error while creating itemID.\n";
     }
 
     @Override
-    public String closeAuction(int auctionId, String clientId) throws RemoteException {
+    public String closeAuction(String auctionId, String clientId) throws RemoteException {
         // FAIL
         if (!auctions.containsKey(auctionId)) {
             return "Auction does not exist.\n";
@@ -127,8 +158,7 @@ public class Server implements AuctionService {
         return auction.closeAuction();
     }
 
-    @Override
-    public String itemDetails(String itemId, String clientId) throws RemoteException {
+    public String itemDetails(String itemId, String clientId) {
         if (!items.containsKey(itemId)) {
             return "Item " + itemId + " does not exist.\n";
         }
@@ -137,7 +167,7 @@ public class Server implements AuctionService {
     }
 
     @Override
-    public String bid(String clientId, int auctionId, int offer) throws RemoteException {
+    public String bid(String clientId, String auctionId, int offer) throws RemoteException {
         if (!auctions.containsKey(auctionId)) {
             return "Auction " + auctionId + " does not exist.\n";
         }
@@ -152,7 +182,7 @@ public class Server implements AuctionService {
     }
 
     @Override
-    public String addItemToAuction(String itemId, int auctionId, int reservedPrice, int startingPrice, String clientId) throws RemoteException {
+    public String addItemToAuction(String itemId, String auctionId, int reservedPrice, int startingPrice, String clientId) throws RemoteException {
         if (!items.containsKey(itemId)) {
             return "Item " + itemId + " does not exist\n";
         }
@@ -182,7 +212,7 @@ public class Server implements AuctionService {
             return "No available auctions.\n";
         }
         String ret = "\nAll auctions:\n\n";
-        for (Integer auctionId : auctions.keySet()) {
+        for (String auctionId : auctions.keySet()) {
             Auction auction = auctions.get(auctionId);
             ret += auction.printAuction();
         }
@@ -190,7 +220,7 @@ public class Server implements AuctionService {
     }
 
     @Override
-    public String getItemsInAuction(int auctionId, String clientId) throws RemoteException {
+    public String getItemsInAuction(String auctionId, String clientId) throws RemoteException {
         if (!auctions.containsKey(auctionId)) {
             return "Auction " + auctionId + " does not exist.\n";
         }

@@ -7,7 +7,7 @@ public class ReverseAuction extends Auction {
     private AuctionItem soldItem;
     private Bid auctionBid;
 
-    public ReverseAuction(int auctionId, String creatorId) {
+    public ReverseAuction(String auctionId, String creatorId) {
         super(auctionId, creatorId);
         this.auctionItems = new LinkedList<>();
         auctionBid = null;

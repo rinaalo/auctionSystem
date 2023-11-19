@@ -8,7 +8,7 @@ public class ForwardAuction extends Auction {
     private List<Bid> auctionBids;
 
     
-    public ForwardAuction(int auctionId, String creatorId) {
+    public ForwardAuction(String auctionId, String creatorId) {
         super(auctionId, creatorId);
         this.auctionItem = null;
         this.auctionBids = new LinkedList<>();
@@ -78,7 +78,7 @@ public class ForwardAuction extends Auction {
         if(auctionBids.isEmpty()) {
             return null;
         }
-        auctionBids.sort(Comparator.comparing(Bid::getOffer).reversed());
+        auctionBids.sort(Comparator.comparing(Bid::getOffer));
         return auctionBids.get(auctionBids.size() - 1);
     }
 
@@ -90,7 +90,6 @@ public class ForwardAuction extends Auction {
             return "Offer has to be higher than the current bid.\n";
         }
         getAuctionBids().add(new Bid(client, offer));
-        System.err.println(getAuctionBids().get(0).getClient().getClientId());
         return "You have bid the amount of " + offer + " in auction " + getAuctionId() + "\n";
     }
 

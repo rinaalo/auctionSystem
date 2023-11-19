@@ -10,7 +10,7 @@ public class DoubleAuction extends Auction {
     private List<Bid> auctionBids;
     private Map<AuctionItem, Bid> winners;
 
-    public DoubleAuction(int auctionId, String creatorId) {
+    public DoubleAuction(String auctionId, String creatorId) {
         super(auctionId, creatorId);
         this.auctionItems = new LinkedList<>();
         this.auctionBids = new LinkedList<>();

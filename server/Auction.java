@@ -1,10 +1,10 @@
 
 public abstract class Auction {
-    private int auctionId;
+    private String auctionId;
     private Boolean ongoing;
     private String creatorId;
 
-    public Auction(int auctionId, String creatorId) {
+    public Auction(String auctionId, String creatorId) {
         this.auctionId = auctionId;
         this.ongoing = true;
         this.creatorId = creatorId;
@@ -14,7 +14,7 @@ public abstract class Auction {
         return this.ongoing;
     }
 
-    public int getAuctionId() {
+    public String getAuctionId() {
         return this.auctionId;
     }
 

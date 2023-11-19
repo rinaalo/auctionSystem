@@ -7,6 +7,7 @@ public class RegisteredClient {
     private String password;
     private ClientType type;
     private List<AuctionItem> items;
+    private List<Auction> auctions;
 
     public RegisteredClient(String clientId, String email, String password, ClientType type) {
         this.clientId = clientId;
@@ -14,6 +15,7 @@ public class RegisteredClient {
         this.password = password;
         this.type = type;
         this.items = new LinkedList<>();
+        this.auctions = new LinkedList<>();
     }
 
     public String getClientId() {
@@ -32,7 +34,15 @@ public class RegisteredClient {
         return items;
     }
 
+    public List<Auction> getAuctions() {
+        return auctions;
+    }
+
     public void addItem(AuctionItem item) {
         items.add(item);
+    }
+
+    public void addAuction(Auction auction) {
+        auctions.add(auction);
     }
 }

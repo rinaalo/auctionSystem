@@ -13,7 +13,7 @@ public class Buyer extends ClientManagement {
     public void register(Scanner option, AuctionService server) {
         Boolean invalidInput = true;
         while(invalidInput) {
-            System.out.println("------ Register ------");
+            System.out.println("\n------ Register ------");
             System.out.print("Username: ");
             String name = option.nextLine();
             System.out.print("Email: ");
@@ -59,12 +59,12 @@ public class Buyer extends ClientManagement {
         =========================================
         show [auction id]
         - - - - - - - - - - - - - - - - - - - - -
-            shows a list of items in an auction along with their details
+            shows a list of items in an auction
             EXAMPLE USAGE: show 2313
         =========================================
         bid [auction id] [bid]
         - - - - - - - - - - - - - - - - - - - - -
-            allows you to bid for a specified auction
+            bid for a specified auction
             EXAMPLE USAGE: bid 1234 500
         =========================================
         create [auction type]
@@ -107,10 +107,7 @@ public class Buyer extends ClientManagement {
                     }
                     try {
                         clear();
-                        System.out.println(server.getItemsInAuction(Integer.parseInt(tokens[1]), clientId));
-                    } catch (NumberFormatException e) {
-                        System.err.println("Invalid ID");
-                        continue;
+                        System.out.println(server.getItemsInAuction(tokens[1], clientId));
                     } catch (RemoteException e) {
                         System.err.println("Request could not be handled due to network problems.");
                         continue;
@@ -123,9 +120,9 @@ public class Buyer extends ClientManagement {
                     }
                     try {
                         clear();
-                        System.out.println(server.bid(clientId, Integer.parseInt(tokens[1]), Integer.parseInt(tokens[2])));
+                        System.out.println(server.bid(clientId, tokens[1], Integer.parseInt(tokens[2])));
                     } catch (NumberFormatException e) {
-                        System.err.println("Invalid ID or bid");
+                        System.err.println("Invalid bid");
                         continue;
                     } catch (RemoteException e) {
                         System.err.println("Request could not be handled due to network problems.");
@@ -162,7 +159,7 @@ public class Buyer extends ClientManagement {
                         continue;
                     }
                     try {
-                        int auctionId = Integer.parseInt(tokens[1]);
+                        String auctionId = tokens[1];
                         clear();
                         System.out.println(server.closeAuction(auctionId, clientId));
                     } catch (NumberFormatException e) {
