@@ -1,13 +1,17 @@
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 public class ForwardAuction extends Auction {
 
     private AuctionItem auctionItem;
+    private List<Bid> auctionBids;
+
     
     public ForwardAuction(int auctionId) {
         super(auctionId);
         this.auctionItem = null;
-        //TODO Auto-generated constructor stub
+        this.auctionBids = new LinkedList<>();
     }
 
     public AuctionItem getAuctionItem() {
@@ -19,9 +23,19 @@ public class ForwardAuction extends Auction {
         return AuctionType.FORWARD;
     }
 
+    public List<Bid> getAuctionBids() {
+        return this.auctionBids;
+    }
+
     @Override
     public Boolean noItemsInAuction() {
         if (auctionItem == null) return true;
+        return false;
+    }
+
+    @Override
+    public Boolean noBidsInAuction() {
+        if(auctionBids.isEmpty()) return true;
         return false;
     }
 
@@ -33,7 +47,23 @@ public class ForwardAuction extends Auction {
     }
 
     @Override
+    public String printAuction() {
+        String highestBid = "";
+        if (noBidsInAuction()) {
+            highestBid = "No bid has been made yet.";
+        } else {
+            highestBid += getHighestBid().getOffer();
+        }
+        String ret = "auction ID: " + getAuctionId() +
+                "\nhighest bid: " + highestBid +
+                "\ntype: " + getAuctionType() +
+                "\nongoing: " + getOngoing() + "\n\n";
+        return ret;
+    }
+
+    @Override
     public String addItemToAuction(AuctionItem item, int auctionId, Map<Integer, Auction> auctions) {
+        //TODO: SHOULD CHECK IF THE ID THAT CREATED THE AUCTION IS THE ONE ADDING THE ITEM
         if (auctionItem != null) {
             return "This auction can only contain one item.\n";
         }
@@ -41,22 +71,56 @@ public class ForwardAuction extends Auction {
         return "Item " + item.getItemId() + " has been added to auction " + auctionId + ".\n";
     }
 
-    @Override
-    public String bid() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'bid'");
+    public Bid getHighestBid() {
+        if(auctionBids.isEmpty()) {
+            return null;
+        }
+        Bid maxBid = auctionBids.get(0);
+        int highestOffer = maxBid.getOffer();
+        for (Bid bid : auctionBids) {
+            if (highestOffer < bid.getOffer()) {
+                highestOffer = bid.getOffer();
+                maxBid = bid;
+            }
+        }
+        return maxBid;
     }
 
     @Override
-    public String determineWinner(int auctionId, Map<Integer, Auction> auctions) {
-        Auction auction = auctions.get(auctionId);
-        Bid bid = auction.getHighestBid();
+    public String bid(int offer, Client client) {
+        if (getHighestBid() == null) {
+        }
+        else if (offer <= getHighestBid().getOffer()) {
+            return "Offer has to be higher than the current bid.\n";
+        }
+        getAuctionBids().add(new Bid(client, offer));
+        return "You have bid the amount of " + offer + " in auction " + getAuctionId() + "\n";
+    }
+
+    @Override
+    public String determineWinner() {
+        setOngoing(false);
+        auctionItem.setInAuction(false);
+        Bid bid = getHighestBid();
         int offer = bid.getOffer();
-        int clientId = bid.getClientId();
+        Client client = bid.getClient();
+
+        auctionItem.setWinner(client.getClientId());
+
+        String name = client.getName();
+        String email = client.getEmail();
+        // if there is no bidders
+        if (getAuctionBids().isEmpty()) {
+            return "Auction is closed.\nThe reserve has not been reached.\n";
+        }
         // if offer is less than reserved price.
         if (offer < auctionItem.getReservedPrice()) {
             return "Auction is closed.\nThe reserve has not been reached.\n";
         }
-        return "";
+        return "Auction is closed." +
+        "\nWinner: " + name +
+        "\nEmail: " + email +
+        "\nItem ID: " + auctionItem.getItemId() +
+        "\nBid: " + offer;
     }
 }

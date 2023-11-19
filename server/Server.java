@@ -49,7 +49,7 @@ public class Server implements AuctionService {
         clientId = generateClientId();
         Client client = new Client(name, email, clientId, type);
         clients.put(clientId, client);
-        System.err.println("client has been added to the system.");
+        System.err.println("client " + clientId + " has been added to the system.");
         return clientId;
     }
 
@@ -99,27 +99,7 @@ public class Server implements AuctionService {
             return "This auction is already closed\n";
         }
         // SUCCESS
-        auction.setOngoing(false);
-        // if no one bid.
-        if (auction.getAuctionBids().isEmpty()) {
-            return "Auction is closed.\nThe reserve has not been reached.\n";
-        }
-        auction.determineWinner(auctionId, auctions);
-        /*
-         * String name = clients.get(clientId).getName();
-         * String email = clients.get(clientId).getEmail();
-         * 
-         * // if offer is less than reserved price.
-         * if (offer < items.get(itemId).getReservedPrice()) {
-         * return "Auction is closed.\nThe reserve has not been reached.\n";
-         * }
-         * return "Auction is closed." +
-         * "\nWinner: " + name +
-         * "\nEmail: " + email +
-         * "\nItem ID: " + itemId +
-         * "\nBid: " + offer;
-         */
-        return null;
+        return auction.determineWinner();
     }
 
     @Override
@@ -132,7 +112,7 @@ public class Server implements AuctionService {
     }
 
     @Override
-    public String bid(int clientId, int auctionId, int bid) throws RemoteException {
+    public String bid(int clientId, int auctionId, int offer) throws RemoteException {
         if (!auctions.containsKey(auctionId)) {
             return "Auction " + auctionId + " does not exist.\n";
         }
@@ -143,15 +123,7 @@ public class Server implements AuctionService {
         if (auction.getOngoing() == false) {
             return "Auction " + auctionId + " is closed.\n";
         }
-        // TODO: check if it is less than the MINIMUM starting price out of all items in
-        // the auction
-        /*
-         * if (bid < items.get(itemId).getStartingPrice()) {
-         * return "Your bid has to be greater than the starting price.\n";
-         * }
-         */
-        auction.getAuctionBids().add(new Bid(clientId, bid));
-        return "You have bid the amount of " + bid + " in auction " + auctionId + "\n";
+        return auction.bid(offer, clients.get(clientId));
     }
 
     @Override
@@ -188,16 +160,7 @@ public class Server implements AuctionService {
         String ret = "\nAll auctions:\n\n";
         for (Integer auctionId : auctions.keySet()) {
             Auction auction = auctions.get(auctionId);
-            String highestBid = "";
-            if (auction.getHighestBid() == null) {
-                highestBid = "No bid has been made yet.";
-            } else {
-                highestBid += auction.getHighestBid().getOffer();
-            }
-            ret += "auction ID: " + auctionId +
-                    "\nhighest bid: " + highestBid +
-                    "\ntype: " + auction.getAuctionType() +
-                    "\nongoing: " + auction.getOngoing() + "\n\n";
+            ret += auction.printAuction();
         }
         return ret;
     }

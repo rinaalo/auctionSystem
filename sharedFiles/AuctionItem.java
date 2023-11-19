@@ -8,6 +8,7 @@ public class AuctionItem implements Serializable {
     private int reservedPrice;
     private int startingPrice;
     private Boolean inAuction;
+    private int winnerId;
 
     public AuctionItem(int itemId, String itemTitle, Boolean used, String itemDescription) {
         this.itemId = itemId;
@@ -46,6 +47,10 @@ public class AuctionItem implements Serializable {
         return inAuction;
     }
 
+    public int getWinner() {
+        return winnerId;
+    }
+
     // set methods
     public void setReservedPrice(int reservedPrice) {
         this.reservedPrice = reservedPrice;
@@ -57,6 +62,10 @@ public class AuctionItem implements Serializable {
     
     public void setInAuction(Boolean inAuction) {
         this.inAuction = inAuction;
+    }
+
+    public void setWinner(int winner) {
+        this.winnerId = winner;
     }
 
     public String printItemDetails() {

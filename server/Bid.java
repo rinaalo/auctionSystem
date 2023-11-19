@@ -1,12 +1,12 @@
 public class Bid {
-    private int clientId;
+    private Client client;
     private int offer;
-    public Bid(int clientId, int bid) {
-        this.clientId = clientId;
+    public Bid(Client client, int bid) {
+        this.client = client;
         this.offer = bid;
     }
-    public int getClientId() {
-        return this.clientId;
+    public Client getClient() {
+        return this.client;
     }
     public int getOffer() {
         return this.offer;

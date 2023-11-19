@@ -18,4 +18,8 @@ public class Client {
     public String getEmail() {
         return this.email;
     }
+
+    public int getClientId() {
+        return this.clientId;
+    }
 }
