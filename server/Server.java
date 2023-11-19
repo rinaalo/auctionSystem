@@ -99,7 +99,7 @@ public class Server implements AuctionService {
             return "This auction is already closed\n";
         }
         // SUCCESS
-        return auction.determineWinner();
+        return auction.closeAuction();
     }
 
     @Override
@@ -149,7 +149,7 @@ public class Server implements AuctionService {
         item.setReservedPrice(reservedPrice);
         item.setStartingPrice(startingPrice);
         item.setInAuction(true);
-        return auction.addItemToAuction(item, auctionId, auctions);
+        return auction.addItemToAuction(item, clientId);
     }
 
     @Override

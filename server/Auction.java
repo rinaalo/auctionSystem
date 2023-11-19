@@ -31,9 +31,11 @@ public abstract class Auction {
 
     public abstract String printAuction();
 
-    public abstract String addItemToAuction(AuctionItem item, int auctionId, Map<Integer, Auction> auctions);
+    public abstract String addItemToAuction(AuctionItem item, int clientId);
 
     public abstract String bid(int offer, Client client);
 
-    public abstract String determineWinner();
+    public abstract String closeAuction();
+
+    public abstract String getWinnerDetails(Map<Integer, Client> clients);
 }

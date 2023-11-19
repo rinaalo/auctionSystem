@@ -5,6 +5,7 @@ import java.util.Map;
 public class ReverseAuction extends Auction {
 
     private List<AuctionItem> auctionItems;
+    private AuctionItem soldItem;
     private Bid auctionBid;
 
     public ReverseAuction(int auctionId) {
@@ -63,9 +64,10 @@ public class ReverseAuction extends Auction {
     }
 
     @Override
-    public String addItemToAuction(AuctionItem item, int auctionId, Map<Integer, Auction> auctions) {
+    public String addItemToAuction(AuctionItem item, int clientId) {
         auctionItems.add(item);
-        return "Item has been added to auction.\n";
+        item.setSeller(clientId);
+        return "Item " + item.getItemId() + " has been added to auction " + getAuctionId() + " by seller " + clientId + ".\n";    
     }
 
     public AuctionItem getCheapestItem() {
@@ -86,6 +88,7 @@ public class ReverseAuction extends Auction {
     @Override
     public String bid(int offer, Client client) {
         // TODO: MAKE SURE ONLY THE PERSON WHO CREATED THE AUCTION CAN BID
+        // BID UNSUCCESSFULL
         AuctionItem cheapestItem = getCheapestItem();
         if (offer < cheapestItem.getReservedPrice()) {
             setOngoing(false);
@@ -94,23 +97,41 @@ public class ReverseAuction extends Auction {
             }
             return "Bid unsuccessful, the reserve has not been reached.\nAuction is closed.\n";
         }
-        cheapestItem.setWinner(client.getClientId());
+        // BID SUCCESSFULL
+        soldItem = cheapestItem;
+        soldItem.setWinner(client.getClientId());
+        int cheapestPrice = soldItem.getReservedPrice();
+        soldItem.setSoldPrice(cheapestPrice);
         auctionBid = new Bid(client, cheapestItem.getReservedPrice());
-        int cheapestPrice = cheapestItem.getReservedPrice();
-        String ret = "Lowest priced item in auction is " + cheapestItem.getItemId() + " with the price of " + cheapestPrice + ".\n" +
-                    "You have bid the amount of " + cheapestItem.getReservedPrice() + " in auction " + getAuctionId() + "\n\n" +
-                    determineWinner();
+        String ret = "Lowest priced item in auction is " + soldItem.getItemId() + " with the price of " + cheapestPrice + ".\n" +
+                    "You have bought this item with the amount of " + soldItem.getReservedPrice() + " in auction " + getAuctionId() + "\n\n" +
+                    closeAuction();
         return ret;
     }
 
     @Override
-    public String determineWinner() {
+    public String closeAuction() {
         setOngoing(false);
+        if(auctionItems.isEmpty()) {
+            return "Auction is closed.\n";
+        }
         for (AuctionItem auctionItem : auctionItems) {
             auctionItem.setInAuction(false);
         }
-        AuctionItem cheapestItem = getCheapestItem();
-        String ret = "The item details: \n" + cheapestItem.printItemDetails();
+        String ret = "The item details: \n" + soldItem.printItemDetails();
+        return ret;
+    }
+
+    @Override
+    public String getWinnerDetails(Map<Integer, Client> clients) {
+        Client buyer = clients.get(soldItem.getWinner());
+        Client seller = clients.get(soldItem.getSeller());
+        String ret = "This Auction is closed!\n Winner details:";
+        ret += "Item: " + soldItem.getItemTitle() + 
+                "\nItem ID: " + soldItem.getItemId() +
+                "\nBuyer: " + buyer.getName() +
+                "\nSold Price " + soldItem.getSoldPrice() +
+                "\nSeller: " + seller.getName();
         return ret;
     }
 }

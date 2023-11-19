@@ -152,7 +152,7 @@ public class Seller extends ClientManagement {
                         clear();
                         System.out.println(server.addItemToAuction(itemId, auctionId, reservedPrice, startingPrice, clientId));
                     } catch (NumberFormatException e) {
-                        System.err.println("Invalid ID");
+                        System.err.println("Invalid number");
                         continue;
                     } catch (RemoteException e) {
                         System.err.println("Request could not be handled due to network problems.");
