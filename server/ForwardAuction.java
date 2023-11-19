@@ -63,7 +63,9 @@ public class ForwardAuction extends Auction {
 
     @Override
     public String addItemToAuction(AuctionItem item, String clientId) {
-        //TODO: SHOULD CHECK IF THE ID THAT CREATED THE AUCTION IS THE ONE ADDING THE ITEM
+        if (!clientId.equals(getCreatorId())) {
+            return "Only the creator of this auction is allowed to add items.\n";
+        }
         if (auctionItem != null) {
             return "This auction can only contain one item.\n";
         }
@@ -81,7 +83,7 @@ public class ForwardAuction extends Auction {
     }
 
     @Override
-    public String bid(int offer, Client client) {
+    public String bid(int offer, RegisteredClient client) {
         if (getHighestBid() == null) {
         }
         else if (offer <= getHighestBid().getOffer()) {
@@ -101,12 +103,7 @@ public class ForwardAuction extends Auction {
         auctionItem.setInAuction(false);
         Bid bid = getHighestBid();
         int offer = bid.getOffer();
-        Client client = bid.getClient();
-        System.err.println(offer);
-        System.err.println(client);
-        System.err.println(client.getClientId());
-        //String name = client.getClientId();
-        //String email = client.getEmail();
+        RegisteredClient client = bid.getClient();
         // if there is no bidders
         if (getAuctionBids().isEmpty()) {
             return "Auction is closed.\nThe reserve has not been reached.\n";

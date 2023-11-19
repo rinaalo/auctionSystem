@@ -3,19 +3,19 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
 
 public class Server implements AuctionService {
     // auction id, auction
     private Map<Integer, Auction> auctions;
     // item id, item
-    private Map<Integer, AuctionItem> items;
+    private Map<String, AuctionItem> items;
     // client id, client
-    private Map<String, Client> clients;
+    private Map<String, RegisteredClient> clients;
 
     // TODO temporary ids
     private int auctionId;
-    private int itemId;
 
     public Server() {
         super();
@@ -23,23 +23,49 @@ public class Server implements AuctionService {
         items = new Hashtable<>();
         clients = new Hashtable<>();
         auctionId = 0;
-        itemId = 0;
     }
 
     @Override
-    public AuctionItem getSpec(int itemId, String clientId) throws RemoteException {
+    public AuctionItem getSpec(String itemId, String clientId) throws RemoteException {
         return items.get(itemId);
     }
 
     @Override
-    public void addItem(AuctionItem item) throws RemoteException {
+    public void addItem(AuctionItem item, String clientId) throws RemoteException {
         items.put(item.getItemId(), item);
+        clients.get(clientId).addItem(item);
         System.err.println("item has been added.");
     }
-
+    
     @Override
-    public int generateItemId(String clientId) throws RemoteException {
-        return ++itemId;
+    public String generateItemId() throws RemoteException {
+        Boolean unique = false;
+        while (!unique) {
+            String str = java.util.UUID.randomUUID().toString();
+            String itemId = str.substring(0, 4);
+            if (items.isEmpty()) {
+                return itemId;
+            }
+            if (items.containsKey(itemId)) {
+                continue;
+            } else {
+                return itemId;
+            }
+        }
+        System.err.println("Encountered error while creating itemID.");
+        return "Encountered error while creating itemID.\n";
+    }
+    
+    public String showClientsItems(String clientId) throws RemoteException {
+        List<AuctionItem> clientsItems = clients.get(clientId).getItems();
+        if (clientsItems.isEmpty()) {
+            return "You have no items yet.\n";
+        }
+        String ret = "List of your items:\n\n";
+        for (AuctionItem item : clientsItems) {
+            ret += itemDetails(item.getItemId(), clientId);
+        }
+        return ret;
     }
 
     @Override
@@ -47,7 +73,7 @@ public class Server implements AuctionService {
         if (clients.containsKey(name)) {
             return false;
         }
-        Client client = new Client(name, email, password, type);
+        RegisteredClient client = new RegisteredClient(name, email, password, type);
         clients.put(name, client);
         System.err.println("client " + name + " has been added to the system.");
         return true;
@@ -92,17 +118,17 @@ public class Server implements AuctionService {
         }
         Auction auction = auctions.get(auctionId);
         if (auction.getOngoing() == false) {
-            return "This auction is already closed\n";
+            return "This auction is already closed.\n";
         }
         if (!auction.getCreatorId().equals(clientId)) {
-            return "This auction does not belong to you\n";
+            return "This auction does not belong to you.\n";
         }
         // SUCCESS
         return auction.closeAuction();
     }
 
     @Override
-    public String itemDetails(int itemId, String clientId) throws RemoteException {
+    public String itemDetails(String itemId, String clientId) throws RemoteException {
         if (!items.containsKey(itemId)) {
             return "Item " + itemId + " does not exist.\n";
         }
@@ -126,7 +152,7 @@ public class Server implements AuctionService {
     }
 
     @Override
-    public String addItemToAuction(int itemId, int auctionId, int reservedPrice, int startingPrice, String clientId) throws RemoteException {
+    public String addItemToAuction(String itemId, int auctionId, int reservedPrice, int startingPrice, String clientId) throws RemoteException {
         if (!items.containsKey(itemId)) {
             return "Item " + itemId + " does not exist\n";
         }

@@ -1,14 +1,19 @@
-public class Client {
+import java.util.LinkedList;
+import java.util.List;
+
+public class RegisteredClient {
     private String clientId;
     private String email;
     private String password;
     private ClientType type;
+    private List<AuctionItem> items;
 
-    public Client(String clientId, String email, String password, ClientType type) {
+    public RegisteredClient(String clientId, String email, String password, ClientType type) {
         this.clientId = clientId;
         this.email = email;
         this.password = password;
         this.type = type;
+        this.items = new LinkedList<>();
     }
 
     public String getClientId() {
@@ -21,5 +26,13 @@ public class Client {
 
     public String getPassword() {
         return this.password;
+    }
+
+    public List<AuctionItem> getItems() {
+        return items;
+    }
+
+    public void addItem(AuctionItem item) {
+        items.add(item);
     }
 }

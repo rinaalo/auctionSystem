@@ -85,9 +85,11 @@ public class ReverseAuction extends Auction {
     }
 
     @Override
-    public String bid(int offer, Client client) {
-        // TODO: MAKE SURE ONLY THE PERSON WHO CREATED THE AUCTION CAN BID
+    public String bid(int offer, RegisteredClient client) {
         // BID UNSUCCESSFULL
+        if (!client.getClientId().equals(getCreatorId())) {
+            return "Only the creator of this auction can bid.\n";
+        }
         AuctionItem cheapestItem = getCheapestItem();
         if (offer < cheapestItem.getReservedPrice()) {
             setOngoing(false);

@@ -1,7 +1,7 @@
 import java.io.Serializable;
 
 public class AuctionItem implements Serializable {
-    private int itemId;
+    private String itemId;
     private String itemTitle;
     private Boolean used;
     private String itemDescription;
@@ -12,7 +12,7 @@ public class AuctionItem implements Serializable {
     private String sellerId;
     private int soldPrice;
 
-    public AuctionItem(int itemId, String itemTitle, Boolean used, String itemDescription) {
+    public AuctionItem(String itemId, String itemTitle, Boolean used, String itemDescription) {
         this.itemId = itemId;
         this.itemTitle = itemTitle;
         this.used = used;
@@ -21,7 +21,7 @@ public class AuctionItem implements Serializable {
     }
 
     // get methods
-    public int getItemId() {
+    public String getItemId() {
         return this.itemId;
     }
 

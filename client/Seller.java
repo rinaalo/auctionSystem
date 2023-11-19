@@ -44,6 +44,19 @@ public class Seller extends ClientManagement {
         - - - - - - - - - - - - - - - - - - - - -
             shows all available prompts
         =========================================
+        items
+        - - - - - - - - - - - - - - - - - - - - -
+            shows all of your items
+        =========================================
+        browse
+        - - - - - - - - - - - - - - - - - - - - -
+            shows all the available auctions
+        =========================================
+        show [auction id]
+        - - - - - - - - - - - - - - - - - - - - -
+            shows a list of items in an auction along with their details
+            EXAMPLE USAGE: show 2313
+        =========================================
         add [item title] [item condition] [item description]
         - - - - - - - - - - - - - - - - - - - - -
             adds an item to the system.
@@ -58,20 +71,20 @@ public class Seller extends ClientManagement {
             shows the details of specified item.
             EXAMPLE USAGE: itemDetails 1234
         =========================================
-        createAuction [auction type]
+        create [auction type]
         - - - - - - - - - - - - - - - - - - - - -
             starts an auction.
             available types: (f)orward, (d)ouble
             EXAMPLE USAGE: createAuction f
         =========================================
-        addItemToAuction [item id] [auction id] [reserved price] [starting price]
+        addToAuction [item id] [auction id] [reserved price] [starting price]
         - - - - - - - - - - - - - - - - - - - - -
             adds an item to an auction
             reserved price is the minimum bid required for the item to be sold.
             starting price is the minimum amount the bidder is allowed to offer.
             EXAMPLE USAGE: add 1234 5678 100 50
         =========================================
-        closeAuction [auction id]
+        close [auction id]
         - - - - - - - - - - - - - - - - - - - - -
             ends the specified auction
             EXAMPLE USAGE: closeAuction 238
@@ -89,13 +102,47 @@ public class Seller extends ClientManagement {
                 case "help":
                     clear();
                     break;
+                case "items":
+                    clear();
+                    try {
+                        System.out.println(server.showClientsItems(clientId));
+                    } catch (RemoteException e) {
+                        System.err.println("Request could not be handled due to network problems.");
+                        e.printStackTrace();
+                    }
+                    break;
+                case "browse":
+                    try {
+                        clear();
+                        System.out.println(server.getAuctions(clientId));
+                    } catch (RemoteException e) {
+                        System.err.println("Request could not be handled due to network problems.");
+                        continue;
+                    }
+                    break;
+                case "show":
+                    if (tokens.length < 2) {
+                        System.err.println("Not enough arguments");
+                        continue;
+                    }
+                    try {
+                        clear();
+                        System.out.println(server.getItemsInAuction(Integer.parseInt(tokens[1]), clientId));
+                    } catch (NumberFormatException e) {
+                        System.err.println("Invalid ID");
+                        continue;
+                    } catch (RemoteException e) {
+                        System.err.println("Request could not be handled due to network problems.");
+                        continue;
+                    }
+                    break;
                 case "add":
                     if (tokens.length < 4) {
                         System.err.println("Not enough arguments");
                         continue;
                     }
                     try {
-                        int itemId = server.generateItemId(clientId);
+                        String itemId = server.generateItemId();
                         String itemTitle = tokens[1];
                         Boolean used = Boolean.valueOf(tokens[2]);
                         String description = "";
@@ -103,7 +150,7 @@ public class Seller extends ClientManagement {
                             description += (tokens[i] + " ");
                         }
                         AuctionItem newItem = new AuctionItem(itemId, itemTitle, used, description);
-                        server.addItem(newItem);
+                        server.addItem(newItem, clientId);
                         clear();
                         System.out.println(server.itemDetails(itemId, clientId));
                     } catch (RemoteException e) {
@@ -117,18 +164,15 @@ public class Seller extends ClientManagement {
                         continue;
                     }
                     try {
-                        int itemId = Integer.parseInt(tokens[1]);
+                        String itemId = tokens[1];
                         clear();
                         System.out.println(server.itemDetails(itemId, clientId));
-                    } catch (NumberFormatException e) {
-                        System.err.println("Invalid ID");
-                        continue;
                     } catch (RemoteException e) {
                         System.err.println("Request could not be handled due to network problems.");
                         continue;
                     }
                     break;
-                case "createAuction":
+                case "create":
                     if (tokens.length < 2) {
                         System.err.println("Not enough arguments");
                         continue;
@@ -153,27 +197,27 @@ public class Seller extends ClientManagement {
                         continue;
                     }
                     break;
-                case "addItemToAuction":
+                case "addToAuction":
                     if (tokens.length < 5) {
                         System.err.println("Not enough arguments");
                         continue;
                     }
                     try {
-                        int itemId = Integer.parseInt(tokens[1]);
+                        String itemId = tokens[1];
                         int auctionId = Integer.parseInt(tokens[2]);
                         int reservedPrice = Integer.parseInt(tokens[3]);
                         int startingPrice = Integer.parseInt(tokens[4]);
                         clear();
                         System.out.println(server.addItemToAuction(itemId, auctionId, reservedPrice, startingPrice, clientId));
                     } catch (NumberFormatException e) {
-                        System.err.println("Invalid number");
+                        System.err.println("Invalid price");
                         continue;
                     } catch (RemoteException e) {
                         System.err.println("Request could not be handled due to network problems.");
                         continue;
                     }
                     break;
-                case "closeAuction":
+                case "close":
                     if (tokens.length < 2) {
                         System.err.println("Not enough arguments");
                         continue;

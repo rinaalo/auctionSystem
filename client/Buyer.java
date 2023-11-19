@@ -67,13 +67,13 @@ public class Buyer extends ClientManagement {
             allows you to bid for a specified auction
             EXAMPLE USAGE: bid 1234 500
         =========================================
-        createAuction [auction type]
+        create [auction type]
         - - - - - - - - - - - - - - - - - - - - -
             starts an auction.
             available types: (r)everse, (d)ouble
             EXAMPLE USAGE: createAuction r
         =========================================
-        closeAuction [auction id]
+        close [auction id]
         - - - - - - - - - - - - - - - - - - - - -
             ends the specified auction
             EXAMPLE USAGE: closeAuction 238
@@ -125,14 +125,14 @@ public class Buyer extends ClientManagement {
                         clear();
                         System.out.println(server.bid(clientId, Integer.parseInt(tokens[1]), Integer.parseInt(tokens[2])));
                     } catch (NumberFormatException e) {
-                        System.err.println("Invalid ID");
+                        System.err.println("Invalid ID or bid");
                         continue;
                     } catch (RemoteException e) {
                         System.err.println("Request could not be handled due to network problems.");
                         continue;
                     }
                     break;
-                case "createAuction":
+                case "create":
                     if (tokens.length < 2) {
                         System.err.println("Not enough arguments");
                         continue;
@@ -157,7 +157,7 @@ public class Buyer extends ClientManagement {
                         continue;
                     }
                     break;
-                case "closeAuction":
+                case "close":
                     if (tokens.length < 2) {
                         continue;
                     }
