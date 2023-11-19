@@ -1,12 +1,13 @@
-import java.util.Map;
 
 public abstract class Auction {
     private int auctionId;
     private Boolean ongoing;
+    private String creatorId;
 
-    public Auction(int auctionId) {
+    public Auction(int auctionId, String creatorId) {
         this.auctionId = auctionId;
         this.ongoing = true;
+        this.creatorId = creatorId;
     }
 
     public Boolean getOngoing() {
@@ -15,6 +16,10 @@ public abstract class Auction {
 
     public int getAuctionId() {
         return this.auctionId;
+    }
+
+    public String getCreatorId() {
+        return this.creatorId;
     }
 
     public void setOngoing(Boolean status) {
@@ -31,11 +36,11 @@ public abstract class Auction {
 
     public abstract String printAuction();
 
-    public abstract String addItemToAuction(AuctionItem item, int clientId);
+    public abstract String addItemToAuction(AuctionItem item, String clientId);
 
     public abstract String bid(int offer, Client client);
 
     public abstract String closeAuction();
 
-    public abstract String getWinnerDetails(Map<Integer, Client> clients);
+    public abstract String getWinnerDetails();
 }

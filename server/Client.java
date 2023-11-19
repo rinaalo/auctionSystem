@@ -1,25 +1,25 @@
 public class Client {
-    private String name;
+    private String clientId;
     private String email;
-    private int clientId;
+    private String password;
     private ClientType type;
 
-    public Client(String name, String email, int clientId, ClientType type) {
-        this.name = name;
-        this.email = email;
+    public Client(String clientId, String email, String password, ClientType type) {
         this.clientId = clientId;
+        this.email = email;
+        this.password = password;
         this.type = type;
     }
 
-    public String getName() {
-        return this.name;
+    public String getClientId() {
+        return this.clientId;
     }
 
     public String getEmail() {
         return this.email;
     }
 
-    public int getClientId() {
-        return this.clientId;
+    public String getPassword() {
+        return this.password;
     }
 }

@@ -1,7 +1,6 @@
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 public class ForwardAuction extends Auction {
 
@@ -9,8 +8,8 @@ public class ForwardAuction extends Auction {
     private List<Bid> auctionBids;
 
     
-    public ForwardAuction(int auctionId) {
-        super(auctionId);
+    public ForwardAuction(int auctionId, String creatorId) {
+        super(auctionId, creatorId);
         this.auctionItem = null;
         this.auctionBids = new LinkedList<>();
     }
@@ -63,7 +62,7 @@ public class ForwardAuction extends Auction {
     }
 
     @Override
-    public String addItemToAuction(AuctionItem item, int clientId) {
+    public String addItemToAuction(AuctionItem item, String clientId) {
         //TODO: SHOULD CHECK IF THE ID THAT CREATED THE AUCTION IS THE ONE ADDING THE ITEM
         if (auctionItem != null) {
             return "This auction can only contain one item.\n";
@@ -77,19 +76,8 @@ public class ForwardAuction extends Auction {
         if(auctionBids.isEmpty()) {
             return null;
         }
-        /* 
-        Bid maxBid = auctionBids.get(0);
-        int highestOffer = maxBid.getOffer();
-        for (Bid bid : auctionBids) {
-            if (highestOffer < bid.getOffer()) {
-                highestOffer = bid.getOffer();
-                maxBid = bid;
-            }
-        }
-        return maxBid;*/
-        auctionBids.sort(Comparator.comparing(Bid::getOffer));
+        auctionBids.sort(Comparator.comparing(Bid::getOffer).reversed());
         return auctionBids.get(auctionBids.size() - 1);
-
     }
 
     @Override
@@ -100,6 +88,7 @@ public class ForwardAuction extends Auction {
             return "Offer has to be higher than the current bid.\n";
         }
         getAuctionBids().add(new Bid(client, offer));
+        System.err.println(getAuctionBids().get(0).getClient().getClientId());
         return "You have bid the amount of " + offer + " in auction " + getAuctionId() + "\n";
     }
 
@@ -113,9 +102,11 @@ public class ForwardAuction extends Auction {
         Bid bid = getHighestBid();
         int offer = bid.getOffer();
         Client client = bid.getClient();
-
-        String name = client.getName();
-        String email = client.getEmail();
+        System.err.println(offer);
+        System.err.println(client);
+        System.err.println(client.getClientId());
+        //String name = client.getClientId();
+        //String email = client.getEmail();
         // if there is no bidders
         if (getAuctionBids().isEmpty()) {
             return "Auction is closed.\nThe reserve has not been reached.\n";
@@ -127,22 +118,17 @@ public class ForwardAuction extends Auction {
         // if item is sold
         auctionItem.setWinner(client.getClientId());
         auctionItem.setSoldPrice(offer);
-        return "Auction is closed." +
-        "\nItem ID: " + auctionItem.getItemId() +
-        "\nWinner: " + name +
-        "\nBid: " + offer;
+        return getWinnerDetails();
     }
 
     @Override
-    public String getWinnerDetails(Map<Integer, Client> clients) {
-        Client buyer = clients.get(auctionItem.getWinner());
-        Client seller = clients.get(auctionItem.getSeller());
-        String ret = "This Auction is closed!\n Winner details:";
+    public String getWinnerDetails() {
+        String ret = "This Auction is closed!\nWinner details:\n\n";
         ret += "Item: " + auctionItem.getItemTitle() + 
                 "\nItem ID: " + auctionItem.getItemId() +
-                "\nBuyer: " + buyer.getName() +
+                "\nBuyer: " + auctionItem.getWinner() +
                 "\nSold Price " + auctionItem.getSoldPrice() +
-                "\nSeller: " + seller.getName();
+                "\nSeller: " + auctionItem.getSeller()  + "\n\n";
         return ret;
     }
 }

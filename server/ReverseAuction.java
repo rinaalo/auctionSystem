@@ -1,6 +1,5 @@
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 public class ReverseAuction extends Auction {
 
@@ -8,8 +7,8 @@ public class ReverseAuction extends Auction {
     private AuctionItem soldItem;
     private Bid auctionBid;
 
-    public ReverseAuction(int auctionId) {
-        super(auctionId);
+    public ReverseAuction(int auctionId, String creatorId) {
+        super(auctionId, creatorId);
         this.auctionItems = new LinkedList<>();
         auctionBid = null;
     }
@@ -64,7 +63,7 @@ public class ReverseAuction extends Auction {
     }
 
     @Override
-    public String addItemToAuction(AuctionItem item, int clientId) {
+    public String addItemToAuction(AuctionItem item, String clientId) {
         auctionItems.add(item);
         item.setSeller(clientId);
         return "Item " + item.getItemId() + " has been added to auction " + getAuctionId() + " by seller " + clientId + ".\n";    
@@ -118,20 +117,17 @@ public class ReverseAuction extends Auction {
         for (AuctionItem auctionItem : auctionItems) {
             auctionItem.setInAuction(false);
         }
-        String ret = "The item details: \n" + soldItem.printItemDetails();
-        return ret;
+        return getWinnerDetails();
     }
 
     @Override
-    public String getWinnerDetails(Map<Integer, Client> clients) {
-        Client buyer = clients.get(soldItem.getWinner());
-        Client seller = clients.get(soldItem.getSeller());
-        String ret = "This Auction is closed!\n Winner details:";
+    public String getWinnerDetails() {
+        String ret = "This Auction is closed!\nWinner details:\n\n";
         ret += "Item: " + soldItem.getItemTitle() + 
                 "\nItem ID: " + soldItem.getItemId() +
-                "\nBuyer: " + buyer.getName() +
+                "\nBuyer: " + soldItem.getWinner() +
                 "\nSold Price " + soldItem.getSoldPrice() +
-                "\nSeller: " + seller.getName();
+                "\nSeller: " + soldItem.getSeller()  + "\n\n";
         return ret;
     }
 }

@@ -3,20 +3,43 @@ import java.util.Scanner;
 
 public class Buyer extends ClientManagement {
 
-    private int clientId = -1;
+    private String clientId;
+
+    public Buyer() {
+        clientId = null;
+    }
 
     @Override
     public void register(Scanner option, AuctionService server) {
-        System.out.println("Register as a buyer by entering your name and email address.");
-        System.out.print("Name: ");
-        String name = option.nextLine();
-        System.out.print("Email: ");
-        String email = option.nextLine();
-        try {
-            clientId = server.addClient(name, email, ClientType.BUYER);
-        } catch (RemoteException e) {
-            System.err.println("Request could not be handled due to network problems.");
+        Boolean invalidInput = true;
+        while(invalidInput) {
+            System.out.println("------ Register ------");
+            System.out.print("Username: ");
+            String name = option.nextLine();
+            System.out.print("Email: ");
+            String email = option.nextLine();
+            System.out.print("Password: ");
+            String password = option.nextLine();
+
+            try {
+                if(server.addClient(name, email, password, ClientType.BUYER)) {
+                    clientId = name;
+                    System.out.println("Registry Successful.\n");
+                    invalidInput = false;
+                } else{
+                    System.out.println("\nUsername taken. Try again.\n");
+                    continue;
+                };
+            } catch (RemoteException e) {
+                System.err.println("Request could not be handled due to network problems.\n");
+            }
         }
+    }
+
+    @Override
+    public void login(Scanner option, AuctionService server) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'login'");
     }
     
     @Override
@@ -60,8 +83,6 @@ public class Buyer extends ClientManagement {
 
     @Override
     public void prompts(Scanner option, AuctionService server) {
-        // TODO:
-        //int clientId = server.
         Boolean inProcess = true;
         while (inProcess) {
             String[] tokens = option.nextLine().split(" ");
@@ -121,11 +142,11 @@ public class Buyer extends ClientManagement {
                         switch (auctionType.toLowerCase()) {
                             case "r":
                                 clear();
-                                System.out.println(server.createReverseAuction());
+                                System.out.println(server.createReverseAuction(clientId));
                                 break;
                             case "d":
                                 clear();
-                                System.out.println(server.createDoubleAuction());
+                                System.out.println(server.createDoubleAuction(clientId));
                                 break;
                             default:
                                 System.err.println("Please try again with a valid auction type r or d");
@@ -143,7 +164,7 @@ public class Buyer extends ClientManagement {
                     try {
                         int auctionId = Integer.parseInt(tokens[1]);
                         clear();
-                        System.out.println(server.closeAuction(auctionId));
+                        System.out.println(server.closeAuction(auctionId, clientId));
                     } catch (NumberFormatException e) {
                         System.err.println("Invalid ID");
                         continue;

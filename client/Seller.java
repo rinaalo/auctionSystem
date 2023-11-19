@@ -3,20 +3,34 @@ import java.util.Scanner;
 
 public class Seller extends ClientManagement {
 
-    private int clientId = -1;
+    private String clientId;
+
+    public Seller() {
+        clientId = null;
+    }
 
     @Override
     public void register(Scanner option, AuctionService server) {
-        System.out.println("Register as a seller by entering your name and email address.");
-        System.out.print("Name: ");
+        System.out.println("------ Register ------");
+        System.out.print("Username: ");
         String name = option.nextLine();
         System.out.print("Email: ");
         String email = option.nextLine();
+        System.out.print("Password: ");
+        String password = option.nextLine();
+
+        clientId = name;
         try {
-            clientId = server.addClient(name, email, ClientType.SELLER);
+            System.out.println(server.addClient(name, email, password, ClientType.SELLER));
         } catch (RemoteException e) {
             System.err.println("Request could not be handled due to network problems.");
         }
+    }
+
+    @Override
+    public void login(Scanner option, AuctionService server) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'login'");
     }
 
     @Override
@@ -124,11 +138,11 @@ public class Seller extends ClientManagement {
                         switch (auctionType.toLowerCase()) {
                             case "f":
                                 clear();
-                                System.out.println(server.createForwardAuction());
+                                System.out.println(server.createForwardAuction(clientId));
                                 break;
                             case "d":
                                 clear();
-                                System.out.println(server.createDoubleAuction());
+                                System.out.println(server.createDoubleAuction(clientId));
                                 break;
                             default:
                                 System.err.println("Please try again with a valid auction type f or d");
@@ -167,7 +181,7 @@ public class Seller extends ClientManagement {
                     try {
                         int auctionId = Integer.parseInt(tokens[1]);
                         clear();
-                        System.out.println(server.closeAuction(auctionId));
+                        System.out.println(server.closeAuction(auctionId, clientId));
                     } catch (NumberFormatException e) {
                         System.err.println("Invalid ID");
                         continue;

@@ -10,8 +10,8 @@ public class DoubleAuction extends Auction {
     private List<Bid> auctionBids;
     private Map<AuctionItem, Bid> winners;
 
-    public DoubleAuction(int auctionId) {
-        super(auctionId);
+    public DoubleAuction(int auctionId, String creatorId) {
+        super(auctionId, creatorId);
         this.auctionItems = new LinkedList<>();
         this.auctionBids = new LinkedList<>();
         this.winners = new Hashtable<>();
@@ -61,7 +61,7 @@ public class DoubleAuction extends Auction {
     }
 
     @Override
-    public String addItemToAuction(AuctionItem item, int clientId) {
+    public String addItemToAuction(AuctionItem item, String clientId) {
         auctionItems.add(item);
         item.setSeller(clientId);
         return "Item " + item.getItemId() + " has been added to auction " + getAuctionId() + " by seller " + clientId + ".\n";
@@ -87,8 +87,8 @@ public class DoubleAuction extends Auction {
             return "Auction is closed.\nThe reserve has not been reached.\n";
         }
         // determine winners
-        auctionBids.sort(Comparator.comparing(Bid::getOffer));
-        auctionItems.sort(Comparator.comparing(AuctionItem::getReservedPrice).reversed());
+        auctionBids.sort(Comparator.comparing(Bid::getOffer).reversed());
+        auctionItems.sort(Comparator.comparing(AuctionItem::getReservedPrice));
         if (auctionItems.size() < auctionBids.size()) {
             for (int i = 0; i < auctionItems.size(); i++) {
                 if (auctionBids.get(i).getOffer() < auctionItems.get(i).getReservedPrice()) continue;
@@ -105,33 +105,19 @@ public class DoubleAuction extends Auction {
             soldItem.setWinner(bid.getClient().getClientId());
             soldItem.setSoldPrice(bid.getOffer());
         }
-        String ret = "Auction is closed.\nSold items:\n " + winnerItems();
-        return ret;
-    }
-
-    public String winnerItems() {
-        String ret = "";
-        for (AuctionItem soldItem : winners.keySet()) {
-            Bid bid = winners.get(soldItem);
-            ret += "Item: " + soldItem.getItemTitle() + 
-                "\nItem ID: " + soldItem.getItemId() +
-                "\nBuyer ID: " + bid.getClient() +
-                "\nSold Price " + soldItem.getSoldPrice() +
-                "\nSeller ID: " + soldItem.getSeller();
-        }
-        return ret;
+        return getWinnerDetails();
     }
 
     @Override
-    public String getWinnerDetails(Map<Integer, Client> clients) {
-        String ret = "This Auction is closed!\n Winner details:";
+    public String getWinnerDetails() {
+        String ret = "This Auction is closed!\nWinner details:\n\n";
         for (AuctionItem soldItem : winners.keySet()) {
             Bid bid = winners.get(soldItem);
             ret += "Item: " + soldItem.getItemTitle() + 
                 "\nItem ID: " + soldItem.getItemId() +
-                "\nBuyer: " + bid.getClient().getName() +
+                "\nBuyer: " + bid.getClient().getClientId() +
                 "\nSold Price " + soldItem.getSoldPrice() +
-                "\nSeller: " + clients.get(soldItem.getSeller()).getName();
+                "\nSeller: " + soldItem.getSeller() + "\n\n";
         }
         return ret;
     }
