@@ -1,18 +1,125 @@
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+import java.security.PublicKey;
 
-public interface AuctionService extends Remote{
-    public Boolean addClient(String clientId, String email, String password) throws RemoteException; 
-    //public AuctionItem getSpec(String itemId, String clientId) throws RemoteException; 
-    public ServerResponse addItem(AuctionItem item, String clientId) throws RemoteException; 
-    public ServerResponse generateItemId() throws RemoteException; 
+public interface AuctionService extends Remote {
+    
+    /**
+     * Add a client to the system.
+     * @param clientId: username of client.
+     * @param email: email address of client.
+     * @param password: new password of client.
+     * @return returns true if successful, otherwise null
+     * @throws RemoteException
+     */
+    public Boolean addClient(String clientId, String email, String password) throws RemoteException;
+
+    /**
+     * Check if a client login is successfull.
+     * @param name: username of client
+     * @param password: password of their account.
+     * @return returns a publicKey if successful, otherwise null
+     * @throws RemoteException
+     */
+    public PublicKey verifyClient(String name, String password) throws RemoteException;
+
+    /**
+     * 
+     * @param item: item to be added to the system
+     * @param clientId: client that added the item to the system
+     * @return returns confirmation of item being added
+     * @throws RemoteException
+     */
+    public ServerResponse addItem(AuctionItem item, String clientId) throws RemoteException;
+
+    /**
+     * 
+     * @return returns generated item id as a string
+     * @throws RemoteException
+     */
+    public ServerResponse generateItemId() throws RemoteException;
+
+    /**
+     * 
+     * @param clientId
+     * @return
+     * @throws RemoteException
+     */
     public ServerResponse showClientsBelongings(String clientId) throws RemoteException;
-    public ServerResponse createForwardAuction(String clientId) throws RemoteException;
-    public ServerResponse createReverseAuction(String clientId) throws RemoteException;
-    public ServerResponse createDoubleAuction(String clientId) throws RemoteException;
+
+    /**
+     * 
+     * @param clientId
+     * @param title
+     * @return
+     * @throws RemoteException
+     */
+    public ServerResponse createForwardAuction(String clientId, String title) throws RemoteException;
+
+    /**
+     * 
+     * @param clientId
+     * @param title
+     * @return
+     * @throws RemoteException
+     */
+    public ServerResponse createReverseAuction(String clientId, String title) throws RemoteException;
+
+    /**
+     * 
+     * @param clientId
+     * @param title
+     * @return
+     * @throws RemoteException
+     */
+    public ServerResponse createDoubleAuction(String clientId, String title) throws RemoteException;
+
+    /**
+     * 
+     * @param auctionId
+     * @param clientId
+     * @return
+     * @throws RemoteException
+     */
     public ServerResponse closeAuction(String auctionId, String clientId) throws RemoteException;
+
+    /**
+     * 
+     * @param clientId
+     * @param auctionId
+     * @param bid
+     * @return
+     * @throws RemoteException
+     */
     public ServerResponse bid(String clientId, String auctionId, int bid) throws RemoteException;
+
+    /**
+     * 
+     * @param clientId
+     * @return
+     * @throws RemoteException
+     */
     public ServerResponse getAuctions(String clientId) throws RemoteException;
-    public ServerResponse addItemToAuction(String itemId, String auctionId, int reservedPrice, int startingPrice, String clientId) throws RemoteException;
+
+    /**
+     * 
+     * @param itemId
+     * @param auctionId
+     * @param reservedPrice
+     * @param startingPrice
+     * @param clientId
+     * @return
+     * @throws RemoteException
+     */
+    public ServerResponse addItemToAuction(String itemId, String auctionId, int reservedPrice, int startingPrice,
+            String clientId) throws RemoteException;
+
+    /**
+     * 
+     * @param auctionId
+     * @param clientId
+     * @return
+     * @throws RemoteException
+     */
     public ServerResponse getItemsInAuction(String auctionId, String clientId) throws RemoteException;
 }

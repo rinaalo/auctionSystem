@@ -1,7 +1,7 @@
 import java.rmi.RemoteException;
 import java.util.Scanner;
 
-public class Buyer extends ClientManagement {
+public class Buyer extends ClientManager {
 
     @Override
     public void showMenu() {
@@ -14,6 +14,10 @@ public class Buyer extends ClientManagement {
         - - - - - - - - - - - - - - - - - - - - -
             shows all available prompts
         =========================================
+        quit
+        - - - - - - - - - - - - - - - - - - - - -
+            quits program
+        =========================================
         browse
         - - - - - - - - - - - - - - - - - - - - -
             shows all the available auctions
@@ -21,23 +25,24 @@ public class Buyer extends ClientManagement {
         show [auction id]
         - - - - - - - - - - - - - - - - - - - - -
             shows a list of items in an auction
-            EXAMPLE USAGE: show 2313
+            EXAMPLE: show 2313
         =========================================
         bid [auction id] [bid]
         - - - - - - - - - - - - - - - - - - - - -
             bid for a specified auction
-            EXAMPLE USAGE: bid 1234 500
+            EXAMPLE: bid 1234 500
         =========================================
-        create [auction type]
+        create [auction title] [auction type]
         - - - - - - - - - - - - - - - - - - - - -
             starts an auction.
+            auction title must only be one word.
             available types: (r)everse, (d)ouble
-            EXAMPLE USAGE: createAuction r
+            EXAMPLE: create jars r
         =========================================
         close [auction id]
         - - - - - - - - - - - - - - - - - - - - -
             ends the specified auction
-            EXAMPLE USAGE: closeAuction 238
+            EXAMPLE: close 238
         =========================================
         """);
     }
@@ -51,6 +56,10 @@ public class Buyer extends ClientManagement {
             switch (tokens[0]) {
                 case "help":
                     clear();
+                    break;
+                case "quit":
+                    System.out.println("Quitting");
+                    System.exit(-1);
                     break;
                 case "browse":
                     try {
@@ -81,7 +90,9 @@ public class Buyer extends ClientManagement {
                     }
                     try {
                         clear();
-                        System.out.println(server.bid(getClientId(), tokens[1], Integer.parseInt(tokens[2])));
+                        String auctionId = tokens[1];
+                        int offer = Integer.parseInt(tokens[2]);
+                        System.out.println(server.bid(getClientId(), auctionId, offer));
                     } catch (NumberFormatException e) {
                         System.err.println("Invalid bid");
                         continue;
@@ -91,20 +102,21 @@ public class Buyer extends ClientManagement {
                     }
                     break;
                 case "create":
-                    if (tokens.length < 2) {
+                    if (tokens.length < 3) {
                         System.err.println("Not enough arguments");
                         continue;
                     }
                     try {
-                        String auctionType = tokens[1];
+                        String auctionTitle = tokens[1];
+                        String auctionType = tokens[2];
                         switch (auctionType.toLowerCase()) {
                             case "r":
                                 clear();
-                                System.out.println(server.createReverseAuction(getClientId()));
+                                System.out.println(server.createReverseAuction(getClientId(), auctionTitle));
                                 break;
                             case "d":
                                 clear();
-                                System.out.println(server.createDoubleAuction(getClientId()));
+                                System.out.println(server.createDoubleAuction(getClientId(), auctionTitle));
                                 break;
                             default:
                                 System.err.println("Please try again with a valid auction type r or d");
@@ -120,8 +132,8 @@ public class Buyer extends ClientManagement {
                         continue;
                     }
                     try {
-                        String auctionId = tokens[1];
                         clear();
+                        String auctionId = tokens[1];
                         System.out.println(server.closeAuction(auctionId, getClientId()));
                     } catch (NumberFormatException e) {
                         System.err.println("Invalid ID");

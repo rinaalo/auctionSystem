@@ -10,8 +10,8 @@ public class DoubleAuction extends Auction {
     private List<Bid> auctionBids;
     private Map<AuctionItem, Bid> winners;
 
-    public DoubleAuction(String auctionId, String creatorId) {
-        super(auctionId, creatorId);
+    public DoubleAuction(String auctionId, String creatorId, String title) {
+        super(auctionId, creatorId, title);
         this.auctionItems = new LinkedList<>();
         this.auctionBids = new LinkedList<>();
         this.winners = new Hashtable<>();
@@ -55,6 +55,7 @@ public class DoubleAuction extends Auction {
     @Override
     public String printAuction() {
         String ret = "auction ID: " + getAuctionId() +
+                "\nauction title: " + getTitle() +
                 "\ntype: " + getAuctionType() +
                 "\nongoing: " + getOngoing() + "\n\n";
         return ret;

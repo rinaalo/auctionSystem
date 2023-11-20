@@ -8,8 +8,8 @@ public class ForwardAuction extends Auction {
     private List<Bid> auctionBids;
 
     
-    public ForwardAuction(String auctionId, String creatorId) {
-        super(auctionId, creatorId);
+    public ForwardAuction(String auctionId, String creatorId, String title) {
+        super(auctionId, creatorId, title);
         this.auctionItem = null;
         this.auctionBids = new LinkedList<>();
     }
@@ -55,6 +55,7 @@ public class ForwardAuction extends Auction {
             highestBid += getHighestBid().getOffer();
         }
         String ret = "auction ID: " + getAuctionId() +
+                "\nauction title: " + getTitle() +
                 "\nhighest bid: " + highestBid +
                 "\ntype: " + getAuctionType() +
                 "\nongoing: " + getOngoing() + "\n\n";

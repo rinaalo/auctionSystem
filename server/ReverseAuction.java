@@ -7,8 +7,8 @@ public class ReverseAuction extends Auction {
     private AuctionItem soldItem;
     private Bid auctionBid;
 
-    public ReverseAuction(String auctionId, String creatorId) {
-        super(auctionId, creatorId);
+    public ReverseAuction(String auctionId, String creatorId, String title) {
+        super(auctionId, creatorId, title);
         this.auctionItems = new LinkedList<>();
         auctionBid = null;
     }
@@ -56,6 +56,7 @@ public class ReverseAuction extends Auction {
             highestBid += auctionBid.getOffer();
         }
         String ret = "auction ID: " + getAuctionId() +
+                "\nauction title: " + getTitle() +
                 "\nhighest bid: " + highestBid +
                 "\ntype: " + getAuctionType() +
                 "\nongoing: " + getOngoing() + "\n\n";
@@ -127,8 +128,8 @@ public class ReverseAuction extends Auction {
         String ret = "This Auction is closed!\nWinner details:\n\n";
         ret += "Item: " + soldItem.getItemTitle() + 
                 "\nItem ID: " + soldItem.getItemId() +
-                "\nBuyer: " + soldItem.getWinner() +
                 "\nSold Price " + soldItem.getSoldPrice() +
+                "\nBuyer: " + soldItem.getWinner() +
                 "\nSeller: " + soldItem.getSeller()  + "\n\n";
         return ret;
     }

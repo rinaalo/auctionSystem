@@ -3,11 +3,13 @@ public abstract class Auction {
     private String auctionId;
     private Boolean ongoing;
     private String creatorId;
+    private String title;
 
-    public Auction(String auctionId, String creatorId) {
+    public Auction(String auctionId, String creatorId, String title) {
         this.auctionId = auctionId;
         this.ongoing = true;
         this.creatorId = creatorId;
+        this.title = title;
     }
 
     public Boolean getOngoing() {
@@ -20,6 +22,10 @@ public abstract class Auction {
 
     public String getCreatorId() {
         return this.creatorId;
+    }
+
+    public String getTitle() {
+        return this.title;
     }
 
     public void setOngoing(Boolean status) {
