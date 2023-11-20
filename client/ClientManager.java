@@ -20,6 +20,13 @@ public abstract class ClientManager {
         return publicKey;
     }
 
+    public String verifySignature(ServerResponse response) {
+        SignatureVerifier.getInstance();
+        if (SignatureVerifier.verify(getServerPublicKey(), response)) {
+            return response.getMessage();
+        } else return "Server response authentication failed.\n";
+    }
+
     public void clientAccount(AuctionService server, Scanner scanner) {
         Boolean invalidEntryInput = true;
         System.out.println("\nWould you like to (R)egister or (l)ogin?");  
@@ -49,6 +56,11 @@ public abstract class ClientManager {
             System.out.print("Password: ");
             String password = option.nextLine();
             
+            if (name == null || password == null) {
+                System.out.println("\nPlease make sure you have entered a username and a password.\n");
+                continue;
+            }
+
             try {
                 if(server.addClient(name, email, password)) {
                     clientId = name;
@@ -78,11 +90,12 @@ public abstract class ClientManager {
                 publicKey = server.verifyClient(name, password);
                 if(publicKey != null) {
                     System.out.println("\nLogin Successful.\n");
+                    clientId = name;
                     invalidInput = false;
                     showMenu();
                     prompts(option, server);
                 } else {
-                    System.out.println("\nLogin Failed.\n"); // TODO fix
+                    System.out.println("\nLogin Failed.\nPlease make sure the username and password are correct.\n");
                     continue;
                 }
             } catch (RemoteException e) {

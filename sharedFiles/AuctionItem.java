@@ -1,15 +1,21 @@
 import java.io.Serializable;
 
 public class AuctionItem implements Serializable {
+    
+    // item details
     private String itemId;
     private String itemTitle;
     private Boolean used;
     private String itemDescription;
-    private int reservedPrice;
-    private int startingPrice;
     private Boolean inAuction;
+    
+    // client details
     private String winnerId;
     private String sellerId;
+    
+    // price details
+    private int reservedPrice;
+    private int startingPrice;
     private int soldPrice;
 
     public AuctionItem(String itemId, String itemTitle, Boolean used, String itemDescription) {
@@ -97,6 +103,6 @@ public class AuctionItem implements Serializable {
                 "Item title: " + itemTitle + "\n" +
                 "Used: " + used + "\n" +
                 "Item description: " + itemDescription + "\n" +
-                price);
+                price + "\n");
     }
 }

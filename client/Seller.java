@@ -31,26 +31,26 @@ public class Seller extends ClientManager {
             shows a list of items in an auction
             EXAMPLE: show 2313
         =========================================
-        add [item title] [item condition] [item description]
+        put [item title] [item condition] [item description]
         - - - - - - - - - - - - - - - - - - - - -
             adds an item to the system.
             item title must only be one word.
             item condition can be true (used),
             anything else will be considered false (new).
             description can be a sentence.
-            EXAMPLE: add paint true paints stuff
+            EXAMPLE: put paint true very nice
         =========================================
         create [auction title] [auction type]
         - - - - - - - - - - - - - - - - - - - - -
-            starts an auction.
+            creates and starts an auction.
             auction title must only be one word.
             available types: (f)orward, (d)ouble
-            EXAMPLE: create jars f
+            EXAMPLE: create jar f
         =========================================
-        addToAuction [item id] [auction id] [reserved price] [starting price]
+        add [item id] [auction id] [reserved price] [starting price]
         - - - - - - - - - - - - - - - - - - - - -
             adds an item to an auction
-            EXAMPLE: addToAuction 1234 5678 100 50
+            EXAMPLE: add 1234 5678 100 50
         =========================================
         close [auction id]
         - - - - - - - - - - - - - - - - - - - - -
@@ -78,10 +78,7 @@ public class Seller extends ClientManager {
                     clear();
                     try {
                         ServerResponse response = server.showClientsBelongings(getClientId());
-                        SignatureVerifier.getInstance();
-                        if (SignatureVerifier.verify(getServerPublicKey(), response)) {
-                            System.out.println(response.getMessage());
-                        }
+                        System.out.println(verifySignature(response));
                     } catch (RemoteException e) {
                         System.err.println("Request could not be handled due to network problems.");
                         e.printStackTrace();
@@ -91,10 +88,7 @@ public class Seller extends ClientManager {
                     try {
                         clear();
                         ServerResponse response = server.getAuctions(getClientId());
-                        SignatureVerifier.getInstance();
-                        if (SignatureVerifier.verify(getServerPublicKey(), response)) {
-                            System.out.println(response.getMessage());
-                        }
+                        System.out.println(verifySignature(response));
                     } catch (RemoteException e) {
                         System.err.println("Request could not be handled due to network problems.");
                         continue;
@@ -108,33 +102,27 @@ public class Seller extends ClientManager {
                     try {
                         clear();
                         ServerResponse response = server.getItemsInAuction(tokens[1], getClientId());
-                        SignatureVerifier.getInstance();
-                        if (SignatureVerifier.verify(getServerPublicKey(), response)) {
-                            System.out.println(response.getMessage());
-                        }
+                        System.out.println(verifySignature(response));
                     } catch (RemoteException e) {
                         System.err.println("Request could not be handled due to network problems.");
                         continue;
                     }
                     break;
-                case "add":
-                //TODO: FIX
+                case "put":
                     if (tokens.length < 4) {
                         System.err.println("Not enough arguments");
                         continue;
                     }
                     try {
-                        ServerResponse resultItemId = server.generateItemId();
-                        String itemId = resultItemId.getMessage();
                         String itemTitle = tokens[1];
                         Boolean used = Boolean.valueOf(tokens[2]);
                         String description = "";
                         for (int i = 3; i < tokens.length; i++) {
                             description += (tokens[i] + " ");
                         }
-                        AuctionItem newItem = new AuctionItem(itemId, itemTitle, used, description);
                         clear();
-                        System.out.println(server.addItem(newItem, getClientId())); 
+                        ServerResponse response = server.putItem(itemTitle, used, description, getClientId());
+                        System.out.println(verifySignature(response));
                     } catch (RemoteException e) {
                         System.err.println("Request could not be handled due to network problems.");
                         continue;
@@ -152,18 +140,12 @@ public class Seller extends ClientManager {
                             case "f":
                                 clear();
                                 ServerResponse responseForward = server.createForwardAuction(getClientId(), auctionTitle);
-                                SignatureVerifier.getInstance();
-                                if (SignatureVerifier.verify(getServerPublicKey(), responseForward)) {
-                                    System.out.println(responseForward.getMessage());
-                                }
+                                System.out.println(verifySignature(responseForward));
                                 break;
                             case "d":
                                 clear();
                                 ServerResponse responseDouble = server.createDoubleAuction(getClientId(), auctionTitle);
-                                SignatureVerifier.getInstance();
-                                if (SignatureVerifier.verify(getServerPublicKey(), responseDouble)) {
-                                    System.out.println(responseDouble.getMessage());
-                                }
+                                System.out.println(verifySignature(responseDouble));
                                 break;
                             default:
                                 System.err.println("Please try again with a valid auction type f or d");
@@ -174,7 +156,7 @@ public class Seller extends ClientManager {
                         continue;
                     }
                     break;
-                case "addToAuction":
+                case "add":
                     if (tokens.length < 5) {
                         System.err.println("Not enough arguments");
                         continue;
@@ -186,10 +168,7 @@ public class Seller extends ClientManager {
                         int startingPrice = Integer.parseInt(tokens[4]);
                         clear();
                         ServerResponse response = server.addItemToAuction(itemId, auctionId, reservedPrice, startingPrice, getClientId());
-                        SignatureVerifier.getInstance();
-                        if (SignatureVerifier.verify(getServerPublicKey(), response)) {
-                            System.out.println(response.getMessage());
-                        }
+                        System.out.println(verifySignature(response));
                     } catch (NumberFormatException e) {
                         System.err.println("Invalid price");
                         continue;
@@ -207,10 +186,7 @@ public class Seller extends ClientManager {
                         String auctionId = tokens[1];
                         clear();
                         ServerResponse response = server.closeAuction(auctionId, getClientId());
-                        SignatureVerifier.getInstance();
-                        if (SignatureVerifier.verify(getServerPublicKey(), response)) {
-                            System.out.println(response.getMessage());
-                        }
+                        System.out.println(verifySignature(response));
                     } catch (RemoteException e) {
                         System.err.println("Request could not be handled due to network problems.");
                         continue;

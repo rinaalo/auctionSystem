@@ -37,7 +37,7 @@ public class Buyer extends ClientManager {
             starts an auction.
             auction title must only be one word.
             available types: (r)everse, (d)ouble
-            EXAMPLE: create jars r
+            EXAMPLE: create jar r
         =========================================
         close [auction id]
         - - - - - - - - - - - - - - - - - - - - -
@@ -64,7 +64,8 @@ public class Buyer extends ClientManager {
                 case "browse":
                     try {
                         clear();
-                        System.out.println(server.getAuctions(getClientId()));
+                        ServerResponse response = server.getAuctions(getClientId());
+                        System.out.println(verifySignature(response));
                     } catch (RemoteException e) {
                         System.err.println("Request could not be handled due to network problems.");
                         continue;
@@ -77,7 +78,8 @@ public class Buyer extends ClientManager {
                     }
                     try {
                         clear();
-                        System.out.println(server.getItemsInAuction(tokens[1], getClientId()));
+                        ServerResponse response = server.getItemsInAuction(tokens[1], getClientId());
+                        System.out.println(verifySignature(response));
                     } catch (RemoteException e) {
                         System.err.println("Request could not be handled due to network problems.");
                         continue;
@@ -92,7 +94,8 @@ public class Buyer extends ClientManager {
                         clear();
                         String auctionId = tokens[1];
                         int offer = Integer.parseInt(tokens[2]);
-                        System.out.println(server.bid(getClientId(), auctionId, offer));
+                        ServerResponse response = server.bid(getClientId(), auctionId, offer);
+                        System.out.println(verifySignature(response));
                     } catch (NumberFormatException e) {
                         System.err.println("Invalid bid");
                         continue;
@@ -112,11 +115,13 @@ public class Buyer extends ClientManager {
                         switch (auctionType.toLowerCase()) {
                             case "r":
                                 clear();
-                                System.out.println(server.createReverseAuction(getClientId(), auctionTitle));
+                                ServerResponse responseReverse = server.createReverseAuction(getClientId(), auctionTitle);
+                                System.out.println(verifySignature(responseReverse));
                                 break;
                             case "d":
                                 clear();
-                                System.out.println(server.createDoubleAuction(getClientId(), auctionTitle));
+                                ServerResponse responseDouble = server.createDoubleAuction(getClientId(), auctionTitle);
+                                System.out.println(verifySignature(responseDouble));
                                 break;
                             default:
                                 System.err.println("Please try again with a valid auction type r or d");
@@ -134,7 +139,8 @@ public class Buyer extends ClientManager {
                     try {
                         clear();
                         String auctionId = tokens[1];
-                        System.out.println(server.closeAuction(auctionId, getClientId()));
+                        ServerResponse response = server.closeAuction(auctionId, getClientId());
+                        System.out.println(verifySignature(response));
                     } catch (NumberFormatException e) {
                         System.err.println("Invalid ID");
                         continue;

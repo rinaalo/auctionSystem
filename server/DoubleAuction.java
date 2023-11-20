@@ -45,6 +45,9 @@ public class DoubleAuction extends Auction {
 
     @Override
     public String printItemsInAuction() {
+        if (auctionItems.isEmpty()) {
+            return "\nAuction has no items yet.\n";
+        }
         String ret = "\nAll items in auction " + getAuctionId() + ":\n\n";
         for (AuctionItem item : auctionItems) {
             ret += item.printItemDetails() + "\n";
@@ -64,7 +67,6 @@ public class DoubleAuction extends Auction {
     @Override
     public String addItemToAuction(AuctionItem item, String clientId) {
         auctionItems.add(item);
-        item.setSeller(clientId);
         return "Item " + item.getItemId() + " has been added to auction " + getAuctionId() + " by seller " + clientId + ".\n";
     }
 
@@ -116,8 +118,8 @@ public class DoubleAuction extends Auction {
             Bid bid = winners.get(soldItem);
             ret += "Item: " + soldItem.getItemTitle() + 
                 "\nItem ID: " + soldItem.getItemId() +
-                "\nBuyer: " + bid.getClient().getClientId() +
                 "\nSold Price " + soldItem.getSoldPrice() +
+                "\nBuyer: " + bid.getClient().getClientId() +
                 "\nSeller: " + soldItem.getSeller() + "\n\n";
         }
         return ret;

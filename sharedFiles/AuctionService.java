@@ -30,14 +30,7 @@ public interface AuctionService extends Remote {
      * @return returns confirmation of item being added
      * @throws RemoteException
      */
-    public ServerResponse addItem(AuctionItem item, String clientId) throws RemoteException;
-
-    /**
-     * 
-     * @return returns generated item id as a string
-     * @throws RemoteException
-     */
-    public ServerResponse generateItemId() throws RemoteException;
+    public ServerResponse putItem(String itemTitle, Boolean used, String description, String clientId) throws RemoteException;
 
     /**
      * 

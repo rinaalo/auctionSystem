@@ -41,6 +41,9 @@ public class ForwardAuction extends Auction {
 
     @Override
     public String printItemsInAuction() {
+        if (auctionItem == null) {
+            return "\nAuction has no item yet.\n";
+        }
         String ret = "\nItem in auction " + getAuctionId() + ":\n\n";
         ret += auctionItem.printItemDetails() + "\n";
         return ret;
@@ -71,7 +74,6 @@ public class ForwardAuction extends Auction {
             return "This auction can only contain one item.\n";
         }
         auctionItem = item;
-        auctionItem.setSeller(clientId);
         return "Item " + item.getItemId() + " has been added to auction " + getAuctionId() + " by seller " + clientId + ".\n";
     }
 
@@ -123,8 +125,8 @@ public class ForwardAuction extends Auction {
         String ret = "This Auction is closed!\nWinner details:\n\n";
         ret += "Item: " + auctionItem.getItemTitle() + 
                 "\nItem ID: " + auctionItem.getItemId() +
-                "\nBuyer: " + auctionItem.getWinner() +
                 "\nSold Price " + auctionItem.getSoldPrice() +
+                "\nBuyer: " + auctionItem.getWinner() +
                 "\nSeller: " + auctionItem.getSeller()  + "\n\n";
         return ret;
     }

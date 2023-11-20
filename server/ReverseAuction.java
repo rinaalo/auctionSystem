@@ -40,6 +40,9 @@ public class ReverseAuction extends Auction {
 
     @Override
     public String printItemsInAuction() {
+        if (auctionItems.isEmpty()) {
+            return "\nAuction has no items yet.\n";
+        }
         String ret = "\nAll items in auction " + getAuctionId() + ":\n\n";
         for (AuctionItem item : auctionItems) {
             ret += item.printItemDetails() + "\n";
@@ -66,7 +69,6 @@ public class ReverseAuction extends Auction {
     @Override
     public String addItemToAuction(AuctionItem item, String clientId) {
         auctionItems.add(item);
-        item.setSeller(clientId);
         return "Item " + item.getItemId() + " has been added to auction " + getAuctionId() + " by seller " + clientId + ".\n";    
     }
 
