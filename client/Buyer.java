@@ -3,45 +3,6 @@ import java.util.Scanner;
 
 public class Buyer extends ClientManagement {
 
-    private String clientId;
-
-    public Buyer() {
-        clientId = null;
-    }
-
-    @Override
-    public void register(Scanner option, AuctionService server) {
-        Boolean invalidInput = true;
-        while(invalidInput) {
-            System.out.println("\n------ Register ------");
-            System.out.print("Username: ");
-            String name = option.nextLine();
-            System.out.print("Email: ");
-            String email = option.nextLine();
-            System.out.print("Password: ");
-            String password = option.nextLine();
-
-            try {
-                if(server.addClient(name, email, password, ClientType.BUYER)) {
-                    clientId = name;
-                    System.out.println("Registry Successful.\n");
-                    invalidInput = false;
-                } else{
-                    System.out.println("\nUsername taken. Try again.\n");
-                    continue;
-                };
-            } catch (RemoteException e) {
-                System.err.println("Request could not be handled due to network problems.\n");
-            }
-        }
-    }
-
-    @Override
-    public void login(Scanner option, AuctionService server) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'login'");
-    }
-    
     @Override
     public void showMenu() {
         System.out.println("""
@@ -94,7 +55,7 @@ public class Buyer extends ClientManagement {
                 case "browse":
                     try {
                         clear();
-                        System.out.println(server.getAuctions(clientId));
+                        System.out.println(server.getAuctions(getClientId()));
                     } catch (RemoteException e) {
                         System.err.println("Request could not be handled due to network problems.");
                         continue;
@@ -107,7 +68,7 @@ public class Buyer extends ClientManagement {
                     }
                     try {
                         clear();
-                        System.out.println(server.getItemsInAuction(tokens[1], clientId));
+                        System.out.println(server.getItemsInAuction(tokens[1], getClientId()));
                     } catch (RemoteException e) {
                         System.err.println("Request could not be handled due to network problems.");
                         continue;
@@ -120,7 +81,7 @@ public class Buyer extends ClientManagement {
                     }
                     try {
                         clear();
-                        System.out.println(server.bid(clientId, tokens[1], Integer.parseInt(tokens[2])));
+                        System.out.println(server.bid(getClientId(), tokens[1], Integer.parseInt(tokens[2])));
                     } catch (NumberFormatException e) {
                         System.err.println("Invalid bid");
                         continue;
@@ -139,11 +100,11 @@ public class Buyer extends ClientManagement {
                         switch (auctionType.toLowerCase()) {
                             case "r":
                                 clear();
-                                System.out.println(server.createReverseAuction(clientId));
+                                System.out.println(server.createReverseAuction(getClientId()));
                                 break;
                             case "d":
                                 clear();
-                                System.out.println(server.createDoubleAuction(clientId));
+                                System.out.println(server.createDoubleAuction(getClientId()));
                                 break;
                             default:
                                 System.err.println("Please try again with a valid auction type r or d");
@@ -161,7 +122,7 @@ public class Buyer extends ClientManagement {
                     try {
                         String auctionId = tokens[1];
                         clear();
-                        System.out.println(server.closeAuction(auctionId, clientId));
+                        System.out.println(server.closeAuction(auctionId, getClientId()));
                     } catch (NumberFormatException e) {
                         System.err.println("Invalid ID");
                         continue;

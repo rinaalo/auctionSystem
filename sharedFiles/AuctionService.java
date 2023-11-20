@@ -2,11 +2,11 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 public interface AuctionService extends Remote{
-    public AuctionItem getSpec(String itemId, String clientId) throws RemoteException; 
+    //public AuctionItem getSpec(String itemId, String clientId) throws RemoteException; 
     public String addItem(AuctionItem item, String clientId) throws RemoteException; 
     public String generateItemId() throws RemoteException; 
     public String showClientsBelongings(String clientId) throws RemoteException;
-    public Boolean addClient(String clientId, String email, String password, ClientType type) throws RemoteException; 
+    public Boolean addClient(String clientId, String email, String password) throws RemoteException; 
     public String createForwardAuction(String clientId) throws RemoteException;
     public String createReverseAuction(String clientId) throws RemoteException;
     public String createDoubleAuction(String clientId) throws RemoteException;

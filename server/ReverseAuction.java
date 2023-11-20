@@ -85,7 +85,7 @@ public class ReverseAuction extends Auction {
     }
 
     @Override
-    public String bid(int offer, RegisteredClient client) {
+    public String bid(int offer, ClientAccount client) {
         // BID UNSUCCESSFULL
         if (!client.getClientId().equals(getCreatorId())) {
             return "Only the creator of this auction can bid.\n";

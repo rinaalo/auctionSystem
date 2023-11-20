@@ -68,7 +68,7 @@ public class DoubleAuction extends Auction {
     }
 
     @Override
-    public String bid(int offer, RegisteredClient client) {
+    public String bid(int offer, ClientAccount client) {
         getAuctionBids().add(new Bid(client, offer));
         return "You have bid the amount of " + offer + " in auction " + getAuctionId() + "\n";
     }

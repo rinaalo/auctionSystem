@@ -83,7 +83,7 @@ public class ForwardAuction extends Auction {
     }
 
     @Override
-    public String bid(int offer, RegisteredClient client) {
+    public String bid(int offer, ClientAccount client) {
         if (getHighestBid() == null) {
         }
         else if (offer <= getHighestBid().getOffer()) {
@@ -102,7 +102,7 @@ public class ForwardAuction extends Auction {
         auctionItem.setInAuction(false);
         Bid bid = getHighestBid();
         int offer = bid.getOffer();
-        RegisteredClient client = bid.getClient();
+        ClientAccount client = bid.getClient();
         // if there is no bidders
         if (getAuctionBids().isEmpty()) {
             return "Auction is closed.\nThe reserve has not been reached.\n";

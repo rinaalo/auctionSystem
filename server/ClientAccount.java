@@ -1,19 +1,17 @@
 import java.util.LinkedList;
 import java.util.List;
 
-public class RegisteredClient {
+public class ClientAccount {
     private String clientId;
     private String email;
     private String password;
-    private ClientType type;
     private List<AuctionItem> items;
     private List<Auction> auctions;
 
-    public RegisteredClient(String clientId, String email, String password, ClientType type) {
+    public ClientAccount(String clientId, String email, String password) {
         this.clientId = clientId;
         this.email = email;
         this.password = password;
-        this.type = type;
         this.items = new LinkedList<>();
         this.auctions = new LinkedList<>();
     }

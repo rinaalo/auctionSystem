@@ -38,7 +38,7 @@ public abstract class Auction {
 
     public abstract String addItemToAuction(AuctionItem item, String clientId);
 
-    public abstract String bid(int offer, RegisteredClient client);
+    public abstract String bid(int offer, ClientAccount client);
 
     public abstract String closeAuction();
 

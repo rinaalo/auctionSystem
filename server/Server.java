@@ -12,7 +12,7 @@ public class Server implements AuctionService {
     // item id, item
     private Map<String, AuctionItem> items;
     // client id, client
-    private Map<String, RegisteredClient> clients;
+    private Map<String, ClientAccount> clients;
 
     public Server() {
         super();
@@ -21,10 +21,10 @@ public class Server implements AuctionService {
         clients = new Hashtable<>();
     }
 
-    @Override
+    /*@Override
     public AuctionItem getSpec(String itemId, String clientId) throws RemoteException {
         return items.get(itemId);
-    }
+    }*/
 
     @Override
     public String addItem(AuctionItem item, String clientId) throws RemoteException {
@@ -83,11 +83,11 @@ public class Server implements AuctionService {
     }
 
     @Override
-    public Boolean addClient(String name, String email, String password, ClientType type) throws RemoteException {
+    public Boolean addClient(String name, String email, String password) throws RemoteException {
         if (clients.containsKey(name)) {
             return false;
         }
-        RegisteredClient client = new RegisteredClient(name, email, password, type);
+        ClientAccount client = new ClientAccount(name, email, password);
         clients.put(name, client);
         System.err.println("client " + name + " has been added to the system.");
         return true;

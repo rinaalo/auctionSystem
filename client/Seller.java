@@ -3,36 +3,6 @@ import java.util.Scanner;
 
 public class Seller extends ClientManagement {
 
-    private String clientId;
-
-    public Seller() {
-        clientId = null;
-    }
-
-    @Override
-    public void register(Scanner option, AuctionService server) {
-        System.out.println("\n------ Register ------");
-        System.out.print("Username: ");
-        String name = option.nextLine();
-        System.out.print("Email: ");
-        String email = option.nextLine();
-        System.out.print("Password: ");
-        String password = option.nextLine();
-
-        clientId = name;
-        try {
-            System.out.println(server.addClient(name, email, password, ClientType.SELLER));
-        } catch (RemoteException e) {
-            System.err.println("Request could not be handled due to network problems.");
-        }
-    }
-
-    @Override
-    public void login(Scanner option, AuctionService server) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'login'");
-    }
-
     @Override
     public void showMenu() {
         System.out.println("""
@@ -98,7 +68,7 @@ public class Seller extends ClientManagement {
                 case "mine":
                     clear();
                     try {
-                        System.out.println(server.showClientsBelongings(clientId));
+                        System.out.println(server.showClientsBelongings(getClientId()));
                     } catch (RemoteException e) {
                         System.err.println("Request could not be handled due to network problems.");
                         e.printStackTrace();
@@ -107,7 +77,7 @@ public class Seller extends ClientManagement {
                 case "browse":
                     try {
                         clear();
-                        System.out.println(server.getAuctions(clientId));
+                        System.out.println(server.getAuctions(getClientId()));
                     } catch (RemoteException e) {
                         System.err.println("Request could not be handled due to network problems.");
                         continue;
@@ -120,7 +90,7 @@ public class Seller extends ClientManagement {
                     }
                     try {
                         clear();
-                        System.out.println(server.getItemsInAuction(tokens[1], clientId));
+                        System.out.println(server.getItemsInAuction(tokens[1], getClientId()));
                     } catch (RemoteException e) {
                         System.err.println("Request could not be handled due to network problems.");
                         continue;
@@ -141,7 +111,7 @@ public class Seller extends ClientManagement {
                         }
                         AuctionItem newItem = new AuctionItem(itemId, itemTitle, used, description);
                         clear();
-                        System.out.println(server.addItem(newItem, clientId)); 
+                        System.out.println(server.addItem(newItem, getClientId())); 
                     } catch (RemoteException e) {
                         System.err.println("Request could not be handled due to network problems.");
                         continue;
@@ -157,11 +127,11 @@ public class Seller extends ClientManagement {
                         switch (auctionType.toLowerCase()) {
                             case "f":
                                 clear();
-                                System.out.println(server.createForwardAuction(clientId));
+                                System.out.println(server.createForwardAuction(getClientId()));
                                 break;
                             case "d":
                                 clear();
-                                System.out.println(server.createDoubleAuction(clientId));
+                                System.out.println(server.createDoubleAuction(getClientId()));
                                 break;
                             default:
                                 System.err.println("Please try again with a valid auction type f or d");
@@ -183,7 +153,7 @@ public class Seller extends ClientManagement {
                         int reservedPrice = Integer.parseInt(tokens[3]);
                         int startingPrice = Integer.parseInt(tokens[4]);
                         clear();
-                        System.out.println(server.addItemToAuction(itemId, auctionId, reservedPrice, startingPrice, clientId));
+                        System.out.println(server.addItemToAuction(itemId, auctionId, reservedPrice, startingPrice, getClientId()));
                     } catch (NumberFormatException e) {
                         System.err.println("Invalid price");
                         continue;
@@ -200,7 +170,7 @@ public class Seller extends ClientManagement {
                     try {
                         String auctionId = tokens[1];
                         clear();
-                        System.out.println(server.closeAuction(auctionId, clientId));
+                        System.out.println(server.closeAuction(auctionId, getClientId()));
                     } catch (RemoteException e) {
                         System.err.println("Request could not be handled due to network problems.");
                         continue;
