@@ -2,6 +2,11 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
@@ -13,12 +18,22 @@ public class Server implements AuctionService {
     private Map<String, AuctionItem> items;
     // client id, client
     private Map<String, ClientAccount> clients;
+    // keys
+    private KeyPair kp;
 
     public Server() {
         super();
         auctions = new Hashtable<>();
         items = new Hashtable<>();
         clients = new Hashtable<>();
+        try {
+			KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
+            kpg.initialize(1024);
+            kp = kpg.generateKeyPair();
+		} catch (NoSuchAlgorithmException e) {
+			System.exit(-1);
+			e.printStackTrace();
+		}
     }
 
     /*@Override
@@ -27,35 +42,35 @@ public class Server implements AuctionService {
     }*/
 
     @Override
-    public String addItem(AuctionItem item, String clientId) throws RemoteException {
+    public ServerResponse addItem(AuctionItem item, String clientId) throws RemoteException {
         items.put(item.getItemId(), item);
         clients.get(clientId).addItem(item);
         System.err.println("item has been added.");
-        return "Item has been added. Item details:\n" + itemDetails(item.getItemId(), clientId);
+        return new ServerResponse("Item has been added. Item details:\n" + itemDetails(item.getItemId(), clientId), kp.getPrivate());
     }
     
     @Override
-    public String generateItemId() throws RemoteException {
+    public ServerResponse generateItemId() throws RemoteException {
         Boolean unique = false;
         while (!unique) {
             String str = java.util.UUID.randomUUID().toString();
             String itemId = str.substring(0, 4);
             if (items.isEmpty()) {
-                return itemId;
+                return new ServerResponse(itemId, kp.getPrivate());
             }
             if (items.containsKey(itemId)) {
                 continue;
             } else {
-                return itemId;
+                return new ServerResponse(itemId, kp.getPrivate());
             }
         }
         System.err.println("Encountered error while creating itemID.");
-        return "Encountered error while creating itemID.\n";
+        return new ServerResponse("Encountered error while creating itemID.\n", kp.getPrivate());
     }
 
     @Override
-    public String showClientsBelongings(String clientId) throws RemoteException {   
-        return showClientsItems(clientId) + "\n" + showClientsAuctions(clientId);
+    public ServerResponse showClientsBelongings(String clientId) throws RemoteException {   
+        return new ServerResponse(showClientsItems(clientId) + "\n" + showClientsAuctions(clientId), kp.getPrivate());
     }
 
     public String showClientsItems(String clientId) {
@@ -94,33 +109,33 @@ public class Server implements AuctionService {
     }
 
     @Override
-    public String createForwardAuction(String clientId) throws RemoteException {
+    public ServerResponse createForwardAuction(String clientId) throws RemoteException {
         String auctionId = generateAuctionId();
         Auction newAuction = new ForwardAuction(auctionId, clientId);
         auctions.put(auctionId, newAuction);
         clients.get(clientId).addAuction(newAuction);
         System.err.println("Forward Auction has been created.");
-        return "Forward Auction has been created.\nAuction ID: " + auctionId + "\n";
+        return new ServerResponse("Forward Auction has been created.\nAuction ID: " + auctionId + "\n", kp.getPrivate());
     }
 
     @Override
-    public String createReverseAuction(String clientId) throws RemoteException {
+    public ServerResponse createReverseAuction(String clientId) throws RemoteException {
         String auctionId = generateAuctionId();
         Auction newAuction = new ReverseAuction(auctionId, clientId);
         auctions.put(auctionId, newAuction);
         clients.get(clientId).addAuction(newAuction);
         System.err.println("Reverse Auction has been created.");
-        return "Reverse Auction has been created.\nAuction ID: " + auctionId + "\n";
+        return new ServerResponse("Reverse Auction has been created.\nAuction ID: " + auctionId + "\n", kp.getPrivate());
     }
 
     @Override
-    public String createDoubleAuction(String clientId) throws RemoteException {
+    public ServerResponse createDoubleAuction(String clientId) throws RemoteException {
         String auctionId = generateAuctionId();
         Auction newAuction = new DoubleAuction(auctionId, clientId);
         auctions.put(auctionId, newAuction);
         clients.get(clientId).addAuction(newAuction);
         System.err.println("Double Auction has been created.");
-        return "Double Auction has been created.\nAuction ID: " + auctionId + "\n";
+        return new ServerResponse("Double Auction has been created.\nAuction ID: " + auctionId + "\n", kp.getPrivate());
     }
 
     public String generateAuctionId() {
@@ -142,20 +157,21 @@ public class Server implements AuctionService {
     }
 
     @Override
-    public String closeAuction(String auctionId, String clientId) throws RemoteException {
-        // FAIL
+    public ServerResponse closeAuction(String auctionId, String clientId) throws RemoteException {
+        String ret;
         if (!auctions.containsKey(auctionId)) {
-            return "Auction does not exist.\n";
+            ret = "Auction does not exist.\n";
+            return new ServerResponse(ret, kp.getPrivate());
         }
         Auction auction = auctions.get(auctionId);
         if (auction.getOngoing() == false) {
-            return "This auction is already closed.\n";
+            ret = "This auction is already closed.\n";
         }
-        if (!auction.getCreatorId().equals(clientId)) {
-            return "This auction does not belong to you.\n";
+        else if (!auction.getCreatorId().equals(clientId)) {
+            ret = "This auction does not belong to you.\n";
         }
-        // SUCCESS
-        return auction.closeAuction();
+        else ret = auction.closeAuction();
+        return new ServerResponse(ret, kp.getPrivate());
     }
 
     public String itemDetails(String itemId, String clientId) {
@@ -167,43 +183,52 @@ public class Server implements AuctionService {
     }
 
     @Override
-    public String bid(String clientId, String auctionId, int offer) throws RemoteException {
+    public ServerResponse bid(String clientId, String auctionId, int offer) throws RemoteException {
+        String ret;
         if (!auctions.containsKey(auctionId)) {
-            return "Auction " + auctionId + " does not exist.\n";
+            ret = "Auction " + auctionId + " does not exist.\n";
+            return new ServerResponse(ret, kp.getPrivate());
         }
         Auction auction = auctions.get(auctionId);
         if (auction.noItemsInAuction()) {
-            return "No available items in auction " + auctionId + ".\n";
+            ret = "No available items in auction " + auctionId + ".\n";
         }
-        if (auction.getOngoing() == false) {
-            return "Auction " + auctionId + " is closed.\n";
+        else if (auction.getOngoing() == false) {
+            ret = "Auction " + auctionId + " is closed.\n";
         }
-        return auction.bid(offer, clients.get(clientId));
+        else ret = auction.bid(offer, clients.get(clientId));
+        return new ServerResponse(ret, kp.getPrivate());
     }
 
     @Override
-    public String addItemToAuction(String itemId, String auctionId, int reservedPrice, int startingPrice, String clientId) throws RemoteException {
+    public ServerResponse addItemToAuction(String itemId, String auctionId, int reservedPrice, int startingPrice, String clientId) throws RemoteException {
+        String ret;
         if (!items.containsKey(itemId)) {
-            return "Item " + itemId + " does not exist\n";
+            ret = "Item " + itemId + " does not exist\n";
+            return new ServerResponse(ret, kp.getPrivate());
         }
         if (!auctions.containsKey(auctionId)) {
-            return "Auction " + auctionId + " does not exist\n";
+            ret = "Auction " + auctionId + " does not exist\n";
+            return new ServerResponse(ret, kp.getPrivate());
         }
         Auction auction = auctions.get(auctionId);
         AuctionItem item = items.get(itemId);
         if (auctions.get(auctionId).getOngoing() == false) {
-            return "Auction " + auctionId + " has been closed.\n";
+            ret = "Auction " + auctionId + " has been closed.\n";
         }
-        if (item.getInAuction()) {
-            return "Item " + itemId + " is already in an auction.\n";
+        else if (item.getInAuction()) {
+            ret = "Item " + itemId + " is already in an auction.\n";
         }
-        if (startingPrice < reservedPrice) {
-            return "Starting price has to be greater than the reserved price.\n";
+        else if (startingPrice < reservedPrice) {
+            ret = "Starting price has to be greater than the reserved price.\n";
+        } 
+        else {
+            item.setReservedPrice(reservedPrice);
+            item.setStartingPrice(startingPrice);
+            item.setInAuction(true);
+            ret = auction.addItemToAuction(item, clientId);
         }
-        item.setReservedPrice(reservedPrice);
-        item.setStartingPrice(startingPrice);
-        item.setInAuction(true);
-        return auction.addItemToAuction(item, clientId);
+        return new ServerResponse(ret, kp.getPrivate());
     }
 
     @Override
