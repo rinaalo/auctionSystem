@@ -88,11 +88,10 @@ public interface AuctionService extends Remote {
 
     /**
      * 
-     * @param clientId
      * @return
      * @throws RemoteException
      */
-    public ServerResponse getAuctions(String clientId) throws RemoteException;
+    public ServerResponse getAuctions() throws RemoteException;
 
     /**
      * 
@@ -110,9 +109,8 @@ public interface AuctionService extends Remote {
     /**
      * 
      * @param auctionId
-     * @param clientId
      * @return
      * @throws RemoteException
      */
-    public ServerResponse getItemsInAuction(String auctionId, String clientId) throws RemoteException;
+    public ServerResponse getItemsInAuction(String auctionId) throws RemoteException;
 }

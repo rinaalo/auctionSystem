@@ -57,6 +57,9 @@ public class DoubleAuction extends Auction {
 
     @Override
     public String printAuction() {
+        if (getIsSuccess()) {
+            return getWinnerDetails();
+        }
         String ret = "auction ID: " + getAuctionId() +
                 "\nauction title: " + getTitle() +
                 "\ntype: " + getAuctionType() +
@@ -107,8 +110,10 @@ public class DoubleAuction extends Auction {
             Bid bid = winners.get(soldItem);
             soldItem.setWinner(bid.getClient().getClientId());
             soldItem.setSoldPrice(bid.getOffer());
+            soldItem.setIsSold(true);
+            setIsSuccess(true);
         }
-        return getWinnerDetails();
+        return printAuction();
     }
 
     @Override

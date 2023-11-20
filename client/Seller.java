@@ -87,7 +87,7 @@ public class Seller extends ClientManager {
                 case "browse":
                     try {
                         clear();
-                        ServerResponse response = server.getAuctions(getClientId());
+                        ServerResponse response = server.getAuctions();
                         System.out.println(verifySignature(response));
                     } catch (RemoteException e) {
                         System.err.println("Request could not be handled due to network problems.");
@@ -101,7 +101,7 @@ public class Seller extends ClientManager {
                     }
                     try {
                         clear();
-                        ServerResponse response = server.getItemsInAuction(tokens[1], getClientId());
+                        ServerResponse response = server.getItemsInAuction(tokens[1]);
                         System.out.println(verifySignature(response));
                     } catch (RemoteException e) {
                         System.err.println("Request could not be handled due to network problems.");
@@ -193,7 +193,8 @@ public class Seller extends ClientManager {
                     }
                     break;
                 default:
-                    break;
+                System.err.println("\nPlease enter a valid prompt.\n");
+                break;
             }
         }
     }

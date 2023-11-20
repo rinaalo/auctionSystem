@@ -2,18 +2,24 @@
 public abstract class Auction {
     private String auctionId;
     private Boolean ongoing;
+    private Boolean isSuccess;
     private String creatorId;
     private String title;
 
     public Auction(String auctionId, String creatorId, String title) {
         this.auctionId = auctionId;
         this.ongoing = true;
+        this.isSuccess = false;
         this.creatorId = creatorId;
         this.title = title;
     }
 
     public Boolean getOngoing() {
         return this.ongoing;
+    }
+
+    public Boolean getIsSuccess() {
+        return this.isSuccess;
     }
 
     public String getAuctionId() {
@@ -30,6 +36,10 @@ public abstract class Auction {
 
     public void setOngoing(Boolean status) {
         this.ongoing = status;
+    }
+
+    public void setIsSuccess(Boolean success) {
+        this.isSuccess = success;
     }
 
     public abstract AuctionType getAuctionType();

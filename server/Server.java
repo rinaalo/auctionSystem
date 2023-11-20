@@ -242,6 +242,9 @@ public class Server implements AuctionService {
         else if (item.getInAuction()) {
             ret = "Item " + itemId + " is already in an auction.\n";
         }
+        else if (item.getIsSold()) {
+            ret = "Item " + itemId + " has already been sold.\n";
+        }
         else if(!item.getSeller().equals(clientId)) {
             ret = "Item " + itemId + " is not yours.\n";
         }
@@ -253,6 +256,7 @@ public class Server implements AuctionService {
         } 
         else {
             // SUCCESS
+            System.out.println("Item " + itemId + " is added to auction " + auctionId);
             item.setReservedPrice(reservedPrice);
             item.setStartingPrice(startingPrice);
             item.setInAuction(true);
@@ -262,7 +266,7 @@ public class Server implements AuctionService {
     }
 
     @Override
-    public ServerResponse getAuctions(String clientId) throws RemoteException {
+    public ServerResponse getAuctions() throws RemoteException {
         if (auctions.isEmpty()) {
             return new ServerResponse("No available auctions.\n", kp.getPrivate());
         }
@@ -275,7 +279,7 @@ public class Server implements AuctionService {
     }
 
     @Override
-    public ServerResponse getItemsInAuction(String auctionId, String clientId) throws RemoteException {
+    public ServerResponse getItemsInAuction(String auctionId) throws RemoteException {
         if (!auctions.containsKey(auctionId)) {
             return new ServerResponse("Auction " + auctionId + " does not exist.\n", kp.getPrivate()); 
         }
@@ -284,7 +288,7 @@ public class Server implements AuctionService {
         if (auction.noItemsInAuction()) {
             ret = "No items in auction " + auctionId + ".\n";
         }
-        if (!auction.getOngoing()) {
+        if (auction.getIsSuccess()) {
             ret = auction.getWinnerDetails();
         }
         else ret = auction.printItemsInAuction();

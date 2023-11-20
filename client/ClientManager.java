@@ -56,7 +56,7 @@ public abstract class ClientManager {
             System.out.print("Password: ");
             String password = option.nextLine();
             
-            if (name == null || password == null) {
+            if (name.equals("") || password.equals("")) {
                 System.out.println("\nPlease make sure you have entered a username and a password.\n");
                 continue;
             }

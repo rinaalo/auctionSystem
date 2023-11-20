@@ -51,6 +51,9 @@ public class ForwardAuction extends Auction {
 
     @Override
     public String printAuction() {
+        if (getIsSuccess()) {
+            return getWinnerDetails();
+        }
         String highestBid = "";
         if (noBidsInAuction()) {
             highestBid = "No bid has been made yet.";
@@ -117,7 +120,9 @@ public class ForwardAuction extends Auction {
         // if item is sold
         auctionItem.setWinner(client.getClientId());
         auctionItem.setSoldPrice(offer);
-        return getWinnerDetails();
+        auctionItem.setIsSold(true);
+        setIsSuccess(true);
+        return printAuction();
     }
 
     @Override

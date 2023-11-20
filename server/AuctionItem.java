@@ -1,6 +1,5 @@
-import java.io.Serializable;
 
-public class AuctionItem implements Serializable {
+public class AuctionItem {
     
     // item details
     private String itemId;
@@ -8,6 +7,7 @@ public class AuctionItem implements Serializable {
     private Boolean used;
     private String itemDescription;
     private Boolean inAuction;
+    private Boolean isSold;
     
     // client details
     private String winnerId;
@@ -24,6 +24,7 @@ public class AuctionItem implements Serializable {
         this.used = used;
         this.itemDescription = itemDescription;
         inAuction = false;
+        isSold = false;
     }
 
     // get methods
@@ -55,6 +56,10 @@ public class AuctionItem implements Serializable {
         return inAuction;
     }
 
+    public Boolean getIsSold() {
+        return isSold;
+    }
+
     public String getWinner() {
         return winnerId;
     }
@@ -78,6 +83,10 @@ public class AuctionItem implements Serializable {
     
     public void setInAuction(Boolean inAuction) {
         this.inAuction = inAuction;
+    }
+
+    public void setIsSold(Boolean isSold) {
+        this.isSold = isSold;
     }
 
     public void setWinner(String winner) {

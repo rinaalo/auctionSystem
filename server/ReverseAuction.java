@@ -52,6 +52,9 @@ public class ReverseAuction extends Auction {
 
     @Override
     public String printAuction() {
+        if (getIsSuccess()) {
+            return getWinnerDetails();
+        }
         String highestBid = "";
         if (noBidsInAuction()) {
             highestBid = "No bid has been made yet.";
@@ -106,6 +109,8 @@ public class ReverseAuction extends Auction {
         soldItem.setWinner(client.getClientId());
         int cheapestPrice = soldItem.getReservedPrice();
         soldItem.setSoldPrice(cheapestPrice);
+        soldItem.setIsSold(true);
+        setIsSuccess(true);
         auctionBid = new Bid(client, cheapestItem.getReservedPrice());
         String ret = "Lowest priced item in auction is " + soldItem.getItemId() + " with the price of " + cheapestPrice + ".\n" +
                     "You have bought this item with the amount of " + soldItem.getReservedPrice() + " in auction " + getAuctionId() + "\n\n" +
@@ -119,10 +124,13 @@ public class ReverseAuction extends Auction {
         if(auctionItems.isEmpty()) {
             return "Auction is closed.\n";
         }
+        if(auctionBid == null) {
+            return "Auction is closed.\n";
+        }
         for (AuctionItem auctionItem : auctionItems) {
             auctionItem.setInAuction(false);
         }
-        return getWinnerDetails();
+        return printAuction();
     }
 
     @Override
