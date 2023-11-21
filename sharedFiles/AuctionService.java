@@ -62,43 +62,43 @@ public interface AuctionService extends Remote {
      * creates new auction of type double
      * @param clientId: username of current client
      * @param title: title of auction
-     * @return confirmation of creation
+     * @return returns confirmation
      * @throws RemoteException
      */
     public ServerResponse createDoubleAuction(String clientId, String title) throws RemoteException;
 
     /**
-     * 
+     * closes specified auction
      * @param auctionId: id of auction to be closed
      * @param clientId: id of client closing the auction
-     * @return closes auction
+     * @return returns confirmation
      * @throws RemoteException
      */
     public ServerResponse closeAuction(String auctionId, String clientId) throws RemoteException;
 
     /**
-     * 
-     * @param clientId
-     * @param auctionId
-     * @param bid
-     * @return
+     * adds a bid to an auction
+     * @param clientId: id of client bidding
+     * @param auctionId: id of auction getting bid
+     * @param bid: value of bid
+     * @return returns confimartion
      * @throws RemoteException
      */
     public ServerResponse bid(String clientId, String auctionId, int bid) throws RemoteException;
 
     /**
-     * 
-     * @return
+     * prints all auctions
+     * @return 
      * @throws RemoteException
      */
     public ServerResponse getAuctions() throws RemoteException;
 
     /**
-     * 
+     * adds an item to a specified auction
      * @param itemId
      * @param auctionId
-     * @param reservedPrice
-     * @param startingPrice
+     * @param reservedPrice: minimum price of the item seller is willing to accept
+     * @param startingPrice: price displayed to the buyers
      * @param clientId
      * @return
      * @throws RemoteException
@@ -107,7 +107,7 @@ public interface AuctionService extends Remote {
             String clientId) throws RemoteException;
 
     /**
-     * 
+     * prints items in an auction
      * @param auctionId
      * @return
      * @throws RemoteException
