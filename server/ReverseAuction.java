@@ -52,9 +52,6 @@ public class ReverseAuction extends Auction {
 
     @Override
     public String printAuction() {
-        if (getIsSuccess()) {
-            return getWinnerDetails();
-        }
         String highestBid = "";
         if (noBidsInAuction()) {
             highestBid = "No bid has been made yet.";
@@ -130,7 +127,9 @@ public class ReverseAuction extends Auction {
         for (AuctionItem auctionItem : auctionItems) {
             auctionItem.setInAuction(false);
         }
-        return printAuction();
+        if (getIsSuccess()) {
+            return getWinnerDetails();
+        } else return "Auction is closed.\n";
     }
 
     @Override

@@ -51,9 +51,6 @@ public class ForwardAuction extends Auction {
 
     @Override
     public String printAuction() {
-        if (getIsSuccess()) {
-            return getWinnerDetails();
-        }
         String highestBid = "";
         if (noBidsInAuction()) {
             highestBid = "No bid has been made yet.";
@@ -102,6 +99,7 @@ public class ForwardAuction extends Auction {
     @Override
     public String closeAuction() {
         setOngoing(false);
+        // if there are no items
         if (auctionItem == null) {
             return "Auction is closed.\n";
         }
@@ -109,7 +107,7 @@ public class ForwardAuction extends Auction {
         Bid bid = getHighestBid();
         int offer = bid.getOffer();
         ClientAccount client = bid.getClient();
-        // if there is no bidders
+        // if there are no bidders
         if (getAuctionBids().isEmpty()) {
             return "Auction is closed.\nThe reserve has not been reached.\n";
         }
@@ -122,7 +120,7 @@ public class ForwardAuction extends Auction {
         auctionItem.setSoldPrice(offer);
         auctionItem.setIsSold(true);
         setIsSuccess(true);
-        return printAuction();
+        return getWinnerDetails();
     }
 
     @Override

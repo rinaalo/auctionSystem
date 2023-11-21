@@ -57,9 +57,6 @@ public class DoubleAuction extends Auction {
 
     @Override
     public String printAuction() {
-        if (getIsSuccess()) {
-            return getWinnerDetails();
-        }
         String ret = "auction ID: " + getAuctionId() +
                 "\nauction title: " + getTitle() +
                 "\ntype: " + getAuctionType() +
@@ -106,14 +103,18 @@ public class DoubleAuction extends Auction {
                 winners.put(auctionItems.get(i), auctionBids.get(i));
             }
         }
-        for (AuctionItem soldItem : winners.keySet()) {
-            Bid bid = winners.get(soldItem);
-            soldItem.setWinner(bid.getClient().getClientId());
-            soldItem.setSoldPrice(bid.getOffer());
-            soldItem.setIsSold(true);
+        if (winners.isEmpty()) {
+            return "Auction is closed.\nNo winners.\n";
+        } else {
             setIsSuccess(true);
+            for (AuctionItem soldItem : winners.keySet()) {
+                Bid bid = winners.get(soldItem);
+                soldItem.setWinner(bid.getClient().getClientId());
+                soldItem.setSoldPrice(bid.getOffer());
+                soldItem.setIsSold(true);
+            }
         }
-        return printAuction();
+        return getWinnerDetails();
     }
 
     @Override

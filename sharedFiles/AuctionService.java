@@ -24,7 +24,7 @@ public interface AuctionService extends Remote {
     public PublicKey verifyClient(String name, String password) throws RemoteException;
 
     /**
-     * 
+     * adds an item to the system
      * @param item: item to be added to the system
      * @param clientId: client that added the item to the system
      * @return returns confirmation of item being added
@@ -33,45 +33,45 @@ public interface AuctionService extends Remote {
     public ServerResponse putItem(String itemTitle, Boolean used, String description, String clientId) throws RemoteException;
 
     /**
-     * 
-     * @param clientId
-     * @return
+     * shows the belongings of the client
+     * @param clientId: username of current client
+     * @return returns all items and auctions of client
      * @throws RemoteException
      */
     public ServerResponse showClientsBelongings(String clientId) throws RemoteException;
 
     /**
-     * 
-     * @param clientId
-     * @param title
-     * @return
+     * creates new auction of type forward
+     * @param clientId: username of current client
+     * @param title: title of auction
+     * @return confirmation of creation
      * @throws RemoteException
      */
     public ServerResponse createForwardAuction(String clientId, String title) throws RemoteException;
 
     /**
-     * 
-     * @param clientId
-     * @param title
-     * @return
+     * creates new auction of type reverse
+     * @param clientId: username of current client
+     * @param title: title of auction
+     * @return confirmation of creation
      * @throws RemoteException
      */
     public ServerResponse createReverseAuction(String clientId, String title) throws RemoteException;
 
     /**
-     * 
-     * @param clientId
-     * @param title
-     * @return
+     * creates new auction of type double
+     * @param clientId: username of current client
+     * @param title: title of auction
+     * @return confirmation of creation
      * @throws RemoteException
      */
     public ServerResponse createDoubleAuction(String clientId, String title) throws RemoteException;
 
     /**
      * 
-     * @param auctionId
-     * @param clientId
-     * @return
+     * @param auctionId: id of auction to be closed
+     * @param clientId: id of client closing the auction
+     * @return closes auction
      * @throws RemoteException
      */
     public ServerResponse closeAuction(String auctionId, String clientId) throws RemoteException;
