@@ -124,7 +124,7 @@ public class DoubleAuction extends Auction {
             Bid bid = winners.get(soldItem);
             ret += "Item: " + soldItem.getItemTitle() + 
                 "\nItem ID: " + soldItem.getItemId() +
-                "\nSold Price " + soldItem.getSoldPrice() +
+                "\nSold Price: " + soldItem.getSoldPrice() +
                 "\nBuyer: " + bid.getClient().getClientId() +
                 "\nSeller: " + soldItem.getSeller() + "\n\n";
         }

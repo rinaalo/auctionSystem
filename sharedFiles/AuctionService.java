@@ -41,31 +41,14 @@ public interface AuctionService extends Remote {
     public ServerResponse showClientsBelongings(String clientId) throws RemoteException;
 
     /**
-     * creates new auction of type forward
-     * @param clientId: username of current client
-     * @param title: title of auction
-     * @return confirmation of creation
+     * 
+     * @param clientId: username of client creating the auction
+     * @param title: category of the auction
+     * @param auctionType: available types are FORWARD, REVERSE, DOUBLE
+     * @return returns confirmation of creation
      * @throws RemoteException
      */
-    public ServerResponse createForwardAuction(String clientId, String title) throws RemoteException;
-
-    /**
-     * creates new auction of type reverse
-     * @param clientId: username of current client
-     * @param title: title of auction
-     * @return confirmation of creation
-     * @throws RemoteException
-     */
-    public ServerResponse createReverseAuction(String clientId, String title) throws RemoteException;
-
-    /**
-     * creates new auction of type double
-     * @param clientId: username of current client
-     * @param title: title of auction
-     * @return returns confirmation
-     * @throws RemoteException
-     */
-    public ServerResponse createDoubleAuction(String clientId, String title) throws RemoteException;
+    public ServerResponse createAuction(String clientId, String title, AuctionType auctionType) throws RemoteException;
 
     /**
      * closes specified auction

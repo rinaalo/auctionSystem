@@ -36,6 +36,28 @@ public class Server implements AuctionService {
     }
 
     @Override
+    public Boolean addClient(String name, String email, String password) throws RemoteException {
+        if (clients.containsKey(name)) {
+            return false;
+        }
+        ClientAccount client = new ClientAccount(name, email, password);
+        clients.put(name, client);
+        System.out.println("Client " + name + " has been added to the system.");
+        return true;
+    }
+
+    @Override
+    public PublicKey verifyClient(String name, String password) throws RemoteException {
+        if (!clients.containsKey(name)) {
+            return null;
+        } else if (!clients.get(name).getPassword().equals(password)) {
+            return null;
+        } else {
+            return kp.getPublic();
+        }
+    }
+
+    @Override
     public ServerResponse putItem(String itemTitle, Boolean used, String description, String clientId) throws RemoteException {
         String itemId = generateItemId();
         if (itemId == null) {
@@ -97,67 +119,33 @@ public class Server implements AuctionService {
     }
 
     @Override
-    public Boolean addClient(String name, String email, String password) throws RemoteException {
-        if (clients.containsKey(name)) {
-            return false;
-        }
-        ClientAccount client = new ClientAccount(name, email, password);
-        clients.put(name, client);
-        System.out.println("Client " + name + " has been added to the system.");
-        return true;
-    }
-
-    @Override
-    public PublicKey verifyClient(String name, String password) throws RemoteException {
-        if (!clients.containsKey(name)) {
-            return null;
-        } else if (!clients.get(name).getPassword().equals(password)) {
-            return null;
-        } else {
-            return kp.getPublic();
-        }
-    }
-
-    @Override
-    public ServerResponse createForwardAuction(String clientId, String title) throws RemoteException {
+    public ServerResponse createAuction(String clientId, String title, AuctionType auctionType) {
         String auctionId = generateAuctionId();
         if (auctionId == null) {
-            System.err.println("Can not create Forward Action.\nAuction ID: " + auctionId);
-            return new ServerResponse("Can not create Forward Action.\nAuction ID: " + auctionId + "\n", kp.getPrivate());
+            System.err.println("Can not create action.\nAuction ID: " + auctionId);
+            return new ServerResponse("Can not create action.\nAuction ID: " + auctionId + "\n", kp.getPrivate());
         }
-        Auction newAuction = new ForwardAuction(auctionId, clientId, title);
-        auctions.put(auctionId, newAuction);
-        clients.get(clientId).addAuction(newAuction);
-        System.out.println("Forward Auction " + auctionId + " has been created by " + clientId);
-        return new ServerResponse("Forward Auction has been created.\nAuction ID: " + auctionId + "\n", kp.getPrivate());
-    }
-
-    @Override
-    public ServerResponse createReverseAuction(String clientId, String title) throws RemoteException {
-        String auctionId = generateAuctionId();
-        if (auctionId == null) {
-            System.err.println("Can not create Reverse Action.\nAuction ID: " + auctionId);
-            return new ServerResponse("Can not create Reverse Action.\nAuction ID: " + auctionId + "\n", kp.getPrivate());
+        switch (auctionType) {
+            case FORWARD:
+                Auction forwardAuction = new ForwardAuction(auctionId, clientId, title);
+                auctions.put(auctionId, forwardAuction);
+                clients.get(clientId).addAuction(forwardAuction);
+                break;
+            case REVERSE:
+                Auction reverseAuction = new ReverseAuction(auctionId, clientId, title);
+                auctions.put(auctionId, reverseAuction);
+                clients.get(clientId).addAuction(reverseAuction);
+                break;
+            case DOUBLE:
+                Auction doubleAuction = new ReverseAuction(auctionId, clientId, title);
+                auctions.put(auctionId, doubleAuction);
+                clients.get(clientId).addAuction(doubleAuction);
+                break;
+            default:
+                return new ServerResponse("Can not create action.\nAuction ID: " + auctionId + "\n", kp.getPrivate());
         }
-        Auction newAuction = new ReverseAuction(auctionId, clientId, title);
-        auctions.put(auctionId, newAuction);
-        clients.get(clientId).addAuction(newAuction);
-        System.out.println("Reverse Auction " + auctionId + " has been created by " + clientId);
-        return new ServerResponse("Reverse Auction has been created.\nAuction ID: " + auctionId + "\n", kp.getPrivate());
-    }
-
-    @Override
-    public ServerResponse createDoubleAuction(String clientId, String title) throws RemoteException {
-        String auctionId = generateAuctionId();
-        if (auctionId == null) {
-            System.err.println("Can not create Double Action.\nAuction ID: " + auctionId);
-            return new ServerResponse("Can not create Double Action.\nAuction ID: " + auctionId + "\n", kp.getPrivate());
-        }
-        Auction newAuction = new DoubleAuction(auctionId, clientId, title);
-        auctions.put(auctionId, newAuction);
-        clients.get(clientId).addAuction(newAuction);
-        System.out.println("Double Auction " + auctionId + " has been created by " + clientId);
-        return new ServerResponse("Double Auction has been created.\nAuction ID: " + auctionId + "\n", kp.getPrivate());
+        System.out.println(auctionType.toString() + " Auction " + auctionId + " has been created by " + clientId);
+        return new ServerResponse(auctionType.toString() + " Auction has been created.\nAuction ID: " + auctionId + "\n", kp.getPrivate());
     }
 
     public String generateAuctionId() {

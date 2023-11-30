@@ -115,12 +115,12 @@ public class Buyer extends ClientManager {
                         switch (auctionType.toLowerCase()) {
                             case "r":
                                 clear();
-                                ServerResponse responseReverse = server.createReverseAuction(getClientId(), auctionTitle);
+                                ServerResponse responseReverse = server.createAuction(getClientId(), auctionTitle, AuctionType.REVERSE);
                                 System.out.println(verifySignature(responseReverse));
                                 break;
                             case "d":
                                 clear();
-                                ServerResponse responseDouble = server.createDoubleAuction(getClientId(), auctionTitle);
+                                ServerResponse responseDouble = server.createAuction(getClientId(), auctionTitle, AuctionType.DOUBLE);
                                 System.out.println(verifySignature(responseDouble));
                                 break;
                             default:

@@ -139,12 +139,12 @@ public class Seller extends ClientManager {
                         switch (auctionType.toLowerCase()) {
                             case "f":
                                 clear();
-                                ServerResponse responseForward = server.createForwardAuction(getClientId(), auctionTitle);
+                                ServerResponse responseForward = server.createAuction(getClientId(), auctionTitle, AuctionType.FORWARD);
                                 System.out.println(verifySignature(responseForward));
                                 break;
                             case "d":
                                 clear();
-                                ServerResponse responseDouble = server.createDoubleAuction(getClientId(), auctionTitle);
+                                ServerResponse responseDouble = server.createAuction(getClientId(), auctionTitle, AuctionType.DOUBLE);
                                 System.out.println(verifySignature(responseDouble));
                                 break;
                             default:
