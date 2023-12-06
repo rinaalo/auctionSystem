@@ -242,8 +242,8 @@ public class Server implements AuctionService {
         else if (startingPrice < reservedPrice) {
             ret = "Starting price has to be greater than the reserved price.\n";
         } 
+        // SUCCESS
         else {
-            // SUCCESS
             System.out.println("Item " + itemId + " is added to auction " + auctionId);
             item.setReservedPrice(reservedPrice);
             item.setStartingPrice(startingPrice);

@@ -4,11 +4,11 @@ set -xe
 rm -f */*.class
 
 cd sharedFiles
-javac *.java
+javac *.java 
 cd ..
 cp sharedFiles/*.class server
 cd server
-javac *.java
+javac -cp "./jgroups-3.6.20.Final.jar":. *.java
 cd ..
 cp sharedFiles/*.class client
 cd client
