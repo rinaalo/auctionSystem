@@ -1,6 +1,7 @@
 {
     "java.project.referencedLibraries": [
         "lib/**/*.jar",
-        "jgroups-3.6.20.Final.jar"
+        "jgroups-3.6.20.Final.jar",
+        "server/jgroups-3.6.20.Final.jar"
     ]
 }
