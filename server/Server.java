@@ -37,7 +37,7 @@ public class Server implements AuctionService {
         } else if (!state.getClients().get(name).getPassword().equals(password)) {
             return null;
         } else {
-            return state.getKp().getPublic();
+            return state.getKeyPair().getPublic();
         }
     }
 
@@ -45,7 +45,7 @@ public class Server implements AuctionService {
     public ServerResponse putItem(String itemTitle, Boolean used, String description, String clientId) throws RemoteException {
         String itemId = generateItemId();
         if (itemId == null) {
-            return new ServerResponse("Can not create item.\nItem ID: " + itemId + "\n", state.getKp().getPrivate());
+            return new ServerResponse("Can not create item.\nItem ID: " + itemId + "\n", state.getKeyPair().getPrivate());
         }
         AuctionItem newItem = new AuctionItem(itemId, itemTitle, used, description);
         state.addItems(itemId, newItem);
@@ -53,7 +53,7 @@ public class Server implements AuctionService {
         newItem.setSeller(clientId);
         replica.sendMessage(msg);
         System.out.println("Item " + itemId + " has been added to the system.");
-        return new ServerResponse("Item has been added to the system. Item details:\n" + itemDetails(itemId, clientId), state.getKp().getPrivate());
+        return new ServerResponse("Item has been added to the system. Item details:\n" + itemDetails(itemId, clientId), state.getKeyPair().getPrivate());
     }
     
     public String generateItemId() {
@@ -76,7 +76,7 @@ public class Server implements AuctionService {
 
     @Override
     public ServerResponse showClientsBelongings(String clientId) throws RemoteException {   
-        return new ServerResponse(showClientsItems(clientId) + "\n" + showClientsAuctions(clientId), state.getKp().getPrivate());
+        return new ServerResponse(showClientsItems(clientId) + "\n" + showClientsAuctions(clientId), state.getKeyPair().getPrivate());
     }
 
     public String showClientsItems(String clientId) {
@@ -108,7 +108,7 @@ public class Server implements AuctionService {
         String auctionId = generateAuctionId();
         if (auctionId == null) {
             System.err.println("Can not create action.\nAuction ID: " + auctionId);
-            return new ServerResponse("Can not create action.\nAuction ID: " + auctionId + "\n", state.getKp().getPrivate());
+            return new ServerResponse("Can not create action.\nAuction ID: " + auctionId + "\n", state.getKeyPair().getPrivate());
         }
         switch (auctionType) {
             case FORWARD:
@@ -127,11 +127,11 @@ public class Server implements AuctionService {
                 state.getClients().get(clientId).addAuction(doubleAuction);
                 break;
             default:
-                return new ServerResponse("Can not create action.\nAuction ID: " + auctionId + "\n", state.getKp().getPrivate());
+                return new ServerResponse("Can not create action.\nAuction ID: " + auctionId + "\n", state.getKeyPair().getPrivate());
         }
         replica.sendMessage(msg);
         System.out.println(auctionType.toString() + " Auction " + auctionId + " has been created by " + clientId);
-        return new ServerResponse(auctionType.toString() + " Auction has been created.\nAuction ID: " + auctionId + "\n", state.getKp().getPrivate());
+        return new ServerResponse(auctionType.toString() + " Auction has been created.\nAuction ID: " + auctionId + "\n", state.getKeyPair().getPrivate());
     }
 
     public String generateAuctionId() {
@@ -157,7 +157,7 @@ public class Server implements AuctionService {
         String ret;
         if (!state.getAuctions().containsKey(auctionId)) {
             ret = "Auction does not exist.\n";
-            return new ServerResponse(ret, state.getKp().getPrivate());
+            return new ServerResponse(ret, state.getKeyPair().getPrivate());
         }
         Auction auction = state.getAuctions().get(auctionId);
         if (auction.getOngoing() == false) {
@@ -168,7 +168,7 @@ public class Server implements AuctionService {
         }
         else ret = auction.closeAuction();
         replica.sendMessage(msg);
-        return new ServerResponse(ret, state.getKp().getPrivate());
+        return new ServerResponse(ret, state.getKeyPair().getPrivate());
     }
 
     public String itemDetails(String itemId, String clientId) {
@@ -184,7 +184,7 @@ public class Server implements AuctionService {
         String ret;
         if (!state.getAuctions().containsKey(auctionId)) {
             ret = "Auction " + auctionId + " does not exist.\n";
-            return new ServerResponse(ret, state.getKp().getPrivate());
+            return new ServerResponse(ret, state.getKeyPair().getPrivate());
         }
         Auction auction = state.getAuctions().get(auctionId);
         if (auction.noItemsInAuction()) {
@@ -195,7 +195,7 @@ public class Server implements AuctionService {
         }
         else ret = auction.bid(offer, state.getClients().get(clientId));
         replica.sendMessage(msg);
-        return new ServerResponse(ret, state.getKp().getPrivate());
+        return new ServerResponse(ret, state.getKeyPair().getPrivate());
     }
 
     @Override
@@ -204,11 +204,11 @@ public class Server implements AuctionService {
         String ret;
         if (!state.getItems().containsKey(itemId)) {
             ret = "Item " + itemId + " does not exist\n";
-            return new ServerResponse(ret, state.getKp().getPrivate());
+            return new ServerResponse(ret, state.getKeyPair().getPrivate());
         }
         if (!state.getAuctions().containsKey(auctionId)) {
             ret = "Auction " + auctionId + " does not exist\n";
-            return new ServerResponse(ret, state.getKp().getPrivate());
+            return new ServerResponse(ret, state.getKeyPair().getPrivate());
         }
         Auction auction = state.getAuctions().get(auctionId);
         AuctionItem item = state.getItems().get(itemId);
@@ -239,26 +239,26 @@ public class Server implements AuctionService {
             ret = auction.addItemToAuction(item, clientId);
         }
         replica.sendMessage(msg);
-        return new ServerResponse(ret, state.getKp().getPrivate());
+        return new ServerResponse(ret, state.getKeyPair().getPrivate());
     }
 
     @Override
     public ServerResponse getAuctions() throws RemoteException {
         if (state.getAuctions().isEmpty()) {
-            return new ServerResponse("No available auctions.\n", state.getKp().getPrivate());
+            return new ServerResponse("No available auctions.\n", state.getKeyPair().getPrivate());
         }
         String ret = "\nAll auctions:\n\n";
         for (String auctionId : state.getAuctions().keySet()) {
             Auction auction = state.getAuctions().get(auctionId);
             ret += auction.printAuction();
         }
-        return new ServerResponse(ret, state.getKp().getPrivate());
+        return new ServerResponse(ret, state.getKeyPair().getPrivate());
     }
 
     @Override
     public ServerResponse getItemsInAuction(String auctionId) throws RemoteException {
         if (!state.getAuctions().containsKey(auctionId)) {
-            return new ServerResponse("Auction " + auctionId + " does not exist.\n", state.getKp().getPrivate()); 
+            return new ServerResponse("Auction " + auctionId + " does not exist.\n", state.getKeyPair().getPrivate()); 
         }
         String ret = "";
         Auction auction = state.getAuctions().get(auctionId);
@@ -269,7 +269,7 @@ public class Server implements AuctionService {
             ret = auction.getWinnerDetails();
         }
         else ret = auction.printItemsInAuction();
-        return new ServerResponse(ret, state.getKp().getPrivate());
+        return new ServerResponse(ret, state.getKeyPair().getPrivate());
     }
 
     public static void main(String[] args) {

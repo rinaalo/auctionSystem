@@ -30,19 +30,19 @@ public class ServerState implements Serializable{
     }
 
     public Map<String, Auction> getAuctions() {
-        return auctions;
+        return this.auctions;
     }
 
     public Map<String, AuctionItem> getItems() {
-        return items;
+        return this.items;
     }
 
     public Map<String, ClientAccount> getClients() {
-        return clients;
+        return this.clients;
     }
 
-    public KeyPair getKp() {
-        return kp;
+    public KeyPair getKeyPair() {
+        return this.kp;
     }
 
     public void addAuctions(String auctionId, Auction auction) {
@@ -55,5 +55,9 @@ public class ServerState implements Serializable{
 
     public void addClients(String clientId, ClientAccount client) {
         this.clients.put(clientId, client);
+    }
+
+    public void setKeyPair(KeyPair newKp) {
+        this.kp = newKp;
     }
 }
