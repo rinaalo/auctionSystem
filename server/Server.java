@@ -10,10 +10,10 @@ import org.jgroups.Message;
 
 public class Server implements AuctionService {
     
-    final ServerState state = new ServerState();
-    final ServerReplication replica = new ServerReplication();
-    final Message msg = new Message(null, "msg");
-
+    ServerState state = new ServerState();
+    Message msg = new Message(null, "update");
+    ServerChannel replica;
+    
     public Server() {
         super();
     }
@@ -278,7 +278,9 @@ public class Server implements AuctionService {
             String name = "myserver";
             AuctionService stub = (AuctionService) UnicastRemoteObject.exportObject(s, 0);
             Registry registry = LocateRegistry.getRegistry();
-            registry.rebind(name, stub);
+            s.replica = new ServerChannel(s, name, stub, registry);
+            Thread thread = new Thread(s.replica);
+            thread.start();
             System.out.println("Server ready");
         } catch (Exception e) {
             System.err.println("Exception:");
