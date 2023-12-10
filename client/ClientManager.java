@@ -1,4 +1,3 @@
-import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.security.PublicKey;
 import java.util.Scanner;
@@ -7,12 +6,10 @@ public abstract class ClientManager {
 
     private String clientId;
     private PublicKey publicKey;
-    private Client client;
 
-    public ClientManager(Client client) {
+    public ClientManager() {
         clientId = null;
         publicKey = null;
-        this.client = client;
     }
 
     public String getClientId() {
@@ -76,12 +73,6 @@ public abstract class ClientManager {
                 };
             } catch (RemoteException e) {
                 System.err.println("Request could not be handled due to network problems.\n");
-                System.err.println("Reconnecting Client...\n");
-                try {
-                    server = client.connectClient();
-                } catch (RemoteException | NotBoundException e1) {
-                    System.out.println("Could not connect.");
-                }
             }
         }
     }
@@ -109,12 +100,6 @@ public abstract class ClientManager {
                 }
             } catch (RemoteException e) {
                 System.err.println("Request could not be handled due to network problems.\n");
-                System.err.println("Reconnecting Client...\n");
-                try {
-                    client.connectClient();
-                } catch (RemoteException | NotBoundException e1) {
-                    System.out.println("Could not connect.");
-                }
             }
         }
     }

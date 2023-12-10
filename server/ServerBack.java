@@ -1,20 +1,46 @@
 import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
-import java.rmi.server.UnicastRemoteObject;
 import java.security.PublicKey;
 import java.util.List;
 
-import org.jgroups.Message;
+import org.jgroups.JChannel;
+import org.jgroups.blocks.MethodCall;
+import org.jgroups.blocks.RequestOptions;
+import org.jgroups.blocks.ResponseMode;
+import org.jgroups.blocks.RpcDispatcher;
 
 
-public class Server implements AuctionService {
+public class ServerBack implements AuctionService {
     
-    ServerState state = new ServerState();
-    ServerChannel replica;
+    private ServerState state = new ServerState();
+
+    private JChannel channel;
+    private RpcDispatcher dispatcher;
     
-    public Server() {
+    public ServerBack() {
         super();
+
+        try {
+            channel = new JChannel();
+            channel.connect("AuctionCluster");
+            dispatcher = new RpcDispatcher(channel, this);
+            state = dispatcher.callRemoteMethod(channel.getView().getCoord(), 
+                    new MethodCall("getState", new Object[]{}, new Class[]{}),
+                    new RequestOptions(ResponseMode.GET_FIRST, 5000, true));
+            if (state != null) {
+                setState(state);
+            }
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+    public void setState(ServerState state) {
+        this.state = state;
+    }
+
+    public ServerState getState() {
+        return this.state;
     }
 
     @Override
@@ -24,8 +50,6 @@ public class Server implements AuctionService {
         }
         ClientAccount client = new ClientAccount(name, email, password);
         state.addClients(name, client);
-        Message msg = new Message(null, null, state);
-        replica.sendMessage(msg);
         System.out.println("Client " + name + " has been added to the system.");
         return true;
     }
@@ -51,8 +75,6 @@ public class Server implements AuctionService {
         state.addItems(itemId, newItem);
         state.getClients().get(clientId).addItem(newItem);
         newItem.setSeller(clientId);
-        Message msg = new Message(null, null, state);
-        replica.sendMessage(msg);
         System.out.println("Item " + itemId + " has been added to the system.");
         return new ServerResponse("Item has been added to the system. Item details:\n" + itemDetails(itemId, clientId), state.getKeyPair().getPrivate());
     }
@@ -130,8 +152,6 @@ public class Server implements AuctionService {
             default:
                 return new ServerResponse("Can not create action.\nAuction ID: " + auctionId + "\n", state.getKeyPair().getPrivate());
         }
-        Message msg = new Message(null, null, state);
-        replica.sendMessage(msg);
         System.out.println(auctionType.toString() + " Auction " + auctionId + " has been created by " + clientId);
         return new ServerResponse(auctionType.toString() + " Auction has been created.\nAuction ID: " + auctionId + "\n", state.getKeyPair().getPrivate());
     }
@@ -169,8 +189,6 @@ public class Server implements AuctionService {
             ret = "This auction does not belong to you.\n";
         }
         else ret = auction.closeAuction();
-        Message msg = new Message(null, null, state);
-        replica.sendMessage(msg);
         return new ServerResponse(ret, state.getKeyPair().getPrivate());
     }
 
@@ -197,8 +215,6 @@ public class Server implements AuctionService {
             ret = "Auction " + auctionId + " is closed.\n";
         }
         else ret = auction.bid(offer, state.getClients().get(clientId));
-        Message msg = new Message(null, null, state);
-        replica.sendMessage(msg);
         return new ServerResponse(ret, state.getKeyPair().getPrivate());
     }
 
@@ -242,8 +258,6 @@ public class Server implements AuctionService {
             item.setInAuction(true);
             ret = auction.addItemToAuction(item, clientId);
         }
-        Message msg = new Message(null, null, state);
-        replica.sendMessage(msg);
         return new ServerResponse(ret, state.getKeyPair().getPrivate());
     }
 
@@ -278,18 +292,6 @@ public class Server implements AuctionService {
     }
 
     public static void main(String[] args) {
-        try {
-            Server s = new Server();
-            String name = "myserver";
-            AuctionService stub = (AuctionService) UnicastRemoteObject.exportObject(s, 0);
-            Registry registry = LocateRegistry.getRegistry();
-            s.replica = new ServerChannel(s, name, stub, registry);
-            Thread thread = new Thread(s.replica);
-            thread.start();
-            System.out.println("Server ready");
-        } catch (Exception e) {
-            System.err.println("Exception:");
-            e.printStackTrace();
-        }
+        new ServerBack();
     }
 }

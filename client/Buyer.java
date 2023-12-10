@@ -1,15 +1,7 @@
-import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.util.Scanner;
 
 public class Buyer extends ClientManager {
-
-    private Client client;
-
-    public Buyer(Client client) {
-        super(client);
-        this.client = client;
-    }
 
     @Override
     public void showMenu() {
@@ -61,81 +53,50 @@ public class Buyer extends ClientManager {
         while (inProcess) {
             String[] tokens = option.nextLine().split(" ");
             System.out.println();
-            switch (tokens[0]) {
-                case "help":
-                    clear();
-                    break;
-                case "quit":
-                    System.out.println("Quitting");
-                    System.exit(-1);
-                    break;
-                case "browse":
-                    try {
+            try {
+                switch (tokens[0]) {
+                    case "help":
+                        clear();
+                        break;
+                    case "quit":
+                        System.out.println("Quitting");
+                        System.exit(-1);
+                        break;
+                    case "browse":
                         clear();
                         ServerResponse response = server.getAuctions();
                         System.out.println(verifySignature(response));
-                    } catch (RemoteException e) {
-                        System.err.println("Request could not be handled due to network problems.\n");
-                        System.err.println("Reconnecting Client...\n");
-                        try {
-                            server = client.connectClient();
-                        } catch (RemoteException | NotBoundException e1) {
-                            System.out.println("Could not connect.");
+                        break;
+                    case "show":
+                        if (tokens.length < 2) {
+                            System.err.println("Not enough arguments");
+                            continue;
                         }
-                        continue;
-                    }
-                    break;
-                case "show":
-                    if (tokens.length < 2) {
-                        System.err.println("Not enough arguments");
-                        continue;
-                    }
-                    try {
                         clear();
-                        ServerResponse response = server.getItemsInAuction(tokens[1]);
+                        response = server.getItemsInAuction(tokens[1]);
                         System.out.println(verifySignature(response));
-                    } catch (RemoteException e) {
-                        System.err.println("Request could not be handled due to network problems.\n");
-                        System.err.println("Reconnecting Client...\n");
-                        try {
-                            server = client.connectClient();
-                        } catch (RemoteException | NotBoundException e1) {
-                            System.out.println("Could not connect.");
+                        break;
+                    case "bid":
+                        if (tokens.length < 3) {
+                            System.err.println("Not enough arguments");
+                            continue;
                         }
-                        continue;
-                    }
-                    break;
-                case "bid":
-                    if (tokens.length < 3) {
-                        System.err.println("Not enough arguments");
-                        continue;
-                    }
-                    try {
-                        clear();
-                        String auctionId = tokens[1];
-                        int offer = Integer.parseInt(tokens[2]);
-                        ServerResponse response = server.bid(getClientId(), auctionId, offer);
-                        System.out.println(verifySignature(response));
-                    } catch (NumberFormatException e) {
-                        System.err.println("Invalid bid");
-                        continue;
-                    } catch (RemoteException e) {
-                        System.err.println("Request could not be handled due to network problems.\n");
-                        System.err.println("Reconnecting Client...\n");
                         try {
-                            server = client.connectClient();
-                        } catch (RemoteException | NotBoundException e1) {
-                            System.out.println("Could not connect.");
+                            clear();
+                            String auctionId = tokens[1];
+                            int offer = Integer.parseInt(tokens[2]);
+                            response = server.bid(getClientId(), auctionId, offer);
+                            System.out.println(verifySignature(response));
+                        } catch (NumberFormatException e) {
+                            System.err.println("Invalid bid");
+                            continue;
                         }
-                        continue;
-                    }
-                    break;
-                case "create":
-                    if (tokens.length < 3) {
-                        System.err.println("Not enough arguments");
-                        continue;
-                    }
-                    try {
+                        break;
+                    case "create":
+                        if (tokens.length < 3) {
+                            System.err.println("Not enough arguments");
+                            continue;
+                        }
                         String auctionTitle = tokens[1];
                         String auctionType = tokens[2];
                         switch (auctionType.toLowerCase()) {
@@ -153,43 +114,27 @@ public class Buyer extends ClientManager {
                                 System.err.println("Please try again with a valid auction type r or d");
                                 break;
                         }
-                    } catch (RemoteException e) {
-                        System.err.println("Request could not be handled due to network problems.\n");
-                        System.err.println("Reconnecting Client...\n");
-                        try {
-                            server = client.connectClient();
-                        } catch (RemoteException | NotBoundException e1) {
-                            System.out.println("Could not connect.");
+                        break;
+                    case "close":
+                        if (tokens.length < 2) {
+                            continue;
                         }
-                        continue;
-                    }
-                    break;
-                case "close":
-                    if (tokens.length < 2) {
-                        continue;
-                    }
-                    try {
-                        clear();
-                        String auctionId = tokens[1];
-                        ServerResponse response = server.closeAuction(auctionId, getClientId());
-                        System.out.println(verifySignature(response));
-                    } catch (NumberFormatException e) {
-                        System.err.println("Invalid ID");
-                        continue;
-                    } catch (RemoteException e) {
-                        System.err.println("Request could not be handled due to network problems.\n");
-                        System.err.println("Reconnecting Client...\n");
                         try {
-                            server = client.connectClient();
-                        } catch (RemoteException | NotBoundException e1) {
-                            System.out.println("Could not connect.");
+                            clear();
+                            String auctionId = tokens[1];
+                            response = server.closeAuction(auctionId, getClientId());
+                            System.out.println(verifySignature(response));
+                        } catch (NumberFormatException e) {
+                            System.err.println("Invalid ID");
+                            continue;
                         }
-                        continue;
-                    }
-                    break;
-                default:
-                    System.err.println("\nPlease enter a valid prompt.\n");
-                    break;
+                        break;
+                    default:
+                        System.err.println("\nPlease enter a valid prompt.\n");
+                        break;
+                } 
+            } catch (RemoteException e) {
+                System.err.println("Request could not be handled due to network problems.\n");
             }
         }
     }
