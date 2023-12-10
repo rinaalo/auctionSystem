@@ -5,8 +5,6 @@ import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.security.PublicKey;
 
-import javax.sound.midi.MidiMessage;
-import javax.sound.midi.Receiver;
 import java.util.Map.Entry;
 
 import org.jgroups.Address;
@@ -18,9 +16,8 @@ import org.jgroups.blocks.RpcDispatcher;
 import org.jgroups.util.Rsp;
 import org.jgroups.util.RspList;
 
-public class ServerFront implements AuctionService, Receiver{
+public class ServerFront implements AuctionService {
 
-    private Registry registry;
     private JChannel channel;
     private RpcDispatcher dispatcher;
 
@@ -34,29 +31,6 @@ public class ServerFront implements AuctionService, Receiver{
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-    }
-
-    public static void main(String[] args) {
-        try {
-            ServerFront frontEnd = new ServerFront();
-            Remote stub = (AuctionService) UnicastRemoteObject.exportObject(frontEnd, 0);
-            frontEnd.registry = LocateRegistry.getRegistry();
-            frontEnd.registry.rebind("myserver",(AuctionService) stub);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Override
-    public void send(MidiMessage message, long timeStamp) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'send'");
-    }
-
-    @Override
-    public void close() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'close'");
     }
 
     @Override
@@ -96,45 +70,153 @@ public class ServerFront implements AuctionService, Receiver{
     }
 
     @Override
-    public ServerResponse putItem(String itemTitle, Boolean used, String description, String clientId)
-            throws RemoteException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'putItem'");
+    public ServerResponse putItem(String itemTitle, Boolean used, String description, String clientId) throws RemoteException {
+        RspList<ServerResponse> list = null;
+        try {
+            list = dispatcher.callRemoteMethods(null, new MethodCall("putItem", new Object[]{itemTitle, used, description, clientId}, 
+                    new Class[]{itemTitle.getClass(), used.getClass(), description.getClass(), clientId.getClass()}), 
+                    new RequestOptions(ResponseMode.GET_ALL, 5000, false));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if(list == null || list.isEmpty()) throw new RemoteException();
+        ServerResponse ret = list.getFirst();
+        for (Entry<Address, Rsp<ServerResponse>> entry : list.entrySet()) {
+            if (!ret.equals(entry.getValue().getValue())) { 
+                System.out.println("NOT EQUAL!");
+                throw new RemoteException();
+            }
+        }
+        return ret;
     }
     @Override
     public ServerResponse showClientsBelongings(String clientId) throws RemoteException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'showClientsBelongings'");
+        RspList<ServerResponse> list = null;
+        try {
+            list = dispatcher.callRemoteMethods(null, new MethodCall("showClientsBelongings", new Object[]{clientId}, 
+                    new Class[]{clientId.getClass()}), 
+                    new RequestOptions(ResponseMode.GET_ALL, 5000, false));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if(list == null || list.isEmpty()) throw new RemoteException();
+        ServerResponse ret = list.getFirst();
+        for (Entry<Address, Rsp<ServerResponse>> entry : list.entrySet()) {
+            if (!ret.equals(entry.getValue().getValue())) throw new RemoteException();
+        }
+        return ret;
     }
     @Override
     public ServerResponse createAuction(String clientId, String title, AuctionType auctionType) throws RemoteException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'createAuction'");
+        RspList<ServerResponse> list = null;
+        try {
+            list = dispatcher.callRemoteMethods(null, new MethodCall("createAuction", new Object[]{clientId, title, auctionType}, 
+                    new Class[]{clientId.getClass(), title.getClass(), auctionType.getClass()}), 
+                    new RequestOptions(ResponseMode.GET_ALL, 5000, false));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if(list == null || list.isEmpty()) throw new RemoteException();
+        ServerResponse ret = list.getFirst();
+        for (Entry<Address, Rsp<ServerResponse>> entry : list.entrySet()) {
+            if (!ret.equals(entry.getValue().getValue())) throw new RemoteException();
+        }
+        return ret;
     }
     @Override
     public ServerResponse closeAuction(String auctionId, String clientId) throws RemoteException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'closeAuction'");
+        RspList<ServerResponse> list = null;
+        try {
+            list = dispatcher.callRemoteMethods(null, new MethodCall("closeAuction", new Object[]{auctionId, clientId}, 
+                    new Class[]{auctionId.getClass(), clientId.getClass()}), 
+                    new RequestOptions(ResponseMode.GET_ALL, 5000, false));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if(list == null || list.isEmpty()) throw new RemoteException();
+        ServerResponse ret = list.getFirst();
+        for (Entry<Address, Rsp<ServerResponse>> entry : list.entrySet()) {
+            if (!ret.equals(entry.getValue().getValue())) throw new RemoteException();
+        }
+        return ret;
     }
     @Override
     public ServerResponse bid(String clientId, String auctionId, int bid) throws RemoteException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'bid'");
+        RspList<ServerResponse> list = null;
+        try {
+            list = dispatcher.callRemoteMethods(null, new MethodCall("bid", new Object[]{clientId, auctionId, bid}, 
+                    new Class[]{clientId.getClass(), auctionId.getClass(), int.class}), 
+                    new RequestOptions(ResponseMode.GET_ALL, 5000, false));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if(list == null || list.isEmpty()) throw new RemoteException();
+        ServerResponse ret = list.getFirst();
+        for (Entry<Address, Rsp<ServerResponse>> entry : list.entrySet()) {
+            if (!ret.equals(entry.getValue().getValue())) throw new RemoteException();
+        }
+        return ret;
     }
     @Override
     public ServerResponse getAuctions() throws RemoteException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getAuctions'");
+        RspList<ServerResponse> list = null;
+        try {
+            list = dispatcher.callRemoteMethods(null, new MethodCall("getAuctions", new Object[]{}, 
+                    new Class[]{}), 
+                    new RequestOptions(ResponseMode.GET_ALL, 5000, false));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if(list == null || list.isEmpty()) throw new RemoteException();
+        ServerResponse ret = list.getFirst();
+        for (Entry<Address, Rsp<ServerResponse>> entry : list.entrySet()) {
+            if (!ret.equals(entry.getValue().getValue())) throw new RemoteException();
+        }
+        return ret;
     }
     @Override
-    public ServerResponse addItemToAuction(String itemId, String auctionId, int reservedPrice, int startingPrice,
-            String clientId) throws RemoteException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'addItemToAuction'");
+    public ServerResponse addItemToAuction(String itemId, String auctionId, int reservedPrice, int startingPrice, String clientId) throws RemoteException {
+        RspList<ServerResponse> list = null;
+        try {
+            list = dispatcher.callRemoteMethods(null, new MethodCall("addItemToAuction", new Object[]{itemId, auctionId, reservedPrice, startingPrice, clientId}, 
+                    new Class[]{itemId.getClass(), auctionId.getClass(), int.class, int.class, clientId.getClass()}), 
+                    new RequestOptions(ResponseMode.GET_ALL, 5000, false));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if(list == null || list.isEmpty()) throw new RemoteException();
+        ServerResponse ret = list.getFirst();
+        for (Entry<Address, Rsp<ServerResponse>> entry : list.entrySet()) {
+            if (!ret.equals(entry.getValue().getValue())) throw new RemoteException();
+        }
+        return ret;
     }
     @Override
     public ServerResponse getItemsInAuction(String auctionId) throws RemoteException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getItemsInAuction'");
+        RspList<ServerResponse> list = null;
+        try {
+            list = dispatcher.callRemoteMethods(null, new MethodCall("getItemsInAuction", new Object[]{auctionId}, 
+                    new Class[]{auctionId.getClass()}), 
+                    new RequestOptions(ResponseMode.GET_ALL, 5000, false));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if(list == null || list.isEmpty()) throw new RemoteException();
+        ServerResponse ret = list.getFirst();
+        for (Entry<Address, Rsp<ServerResponse>> entry : list.entrySet()) {
+            if (!ret.equals(entry.getValue().getValue())) throw new RemoteException();
+        }
+        return ret;
+    }
+
+    public static void main(String[] args) {
+        try {
+            ServerFront frontEnd = new ServerFront();
+            Remote stub = (AuctionService) UnicastRemoteObject.exportObject(frontEnd, 0);
+            Registry registry = LocateRegistry.getRegistry();
+            registry.rebind("myserver",(AuctionService) stub);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

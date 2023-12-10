@@ -5,6 +5,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.Signature;
 import java.security.SignatureException;
+import java.util.Arrays;
 
 public class ServerResponse implements Serializable {
     private String message;
@@ -41,5 +42,17 @@ public class ServerResponse implements Serializable {
 
     public byte[] getSignature() {
         return signatureArray;
+    }
+
+    public boolean equals(Object o) {
+        if (o == this) {
+            return true;
+        }
+        if (!(o instanceof ServerResponse)) {
+            return false;
+        }
+        ServerResponse c = (ServerResponse) o;
+        return message.equals(c.message) && Arrays.equals(signatureArray, c.signatureArray);
+
     }
 }

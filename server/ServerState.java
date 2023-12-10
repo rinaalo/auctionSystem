@@ -14,11 +14,16 @@ public class ServerState implements Serializable {
     private Map<String, ClientAccount> clients;
     // keys
     private KeyPair kp;
+    // id counters
+    private int itemIdCounter;
+    private int auctionIdCounter;
 
     public ServerState() {
         auctions = new Hashtable<>();
         items = new Hashtable<>();
         clients = new Hashtable<>();
+        itemIdCounter = 1000;
+        auctionIdCounter = 1000;
         try {
 			KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
             kpg.initialize(1024);
@@ -45,6 +50,16 @@ public class ServerState implements Serializable {
         return this.kp;
     }
 
+    public int getItemIdCounter() {
+        this.itemIdCounter++;
+        return itemIdCounter;
+    }
+
+    public int getAuctionIdCounter() {
+        this.auctionIdCounter++;
+        return this.auctionIdCounter;
+    }
+
     public void addAuctions(String auctionId, Auction auction) {
         this.auctions.put(auctionId, auction);
     }
@@ -59,5 +74,5 @@ public class ServerState implements Serializable {
 
     public void setKeyPair(KeyPair newKp) {
         this.kp = newKp;
-    }
+    }    
 }

@@ -11,23 +11,23 @@ import org.jgroups.blocks.RpcDispatcher;
 
 public class ServerBack implements AuctionService {
     
-    private ServerState state = new ServerState();
+    private ServerState state = new ServerState();;
 
     private JChannel channel;
     private RpcDispatcher dispatcher;
+
     
     public ServerBack() {
         super();
-
         try {
             channel = new JChannel();
             channel.connect("AuctionCluster");
             dispatcher = new RpcDispatcher(channel, this);
-            state = dispatcher.callRemoteMethod(channel.getView().getCoord(), 
+            ServerState s = dispatcher.callRemoteMethod(channel.getView().getCoord(), 
                     new MethodCall("getState", new Object[]{}, new Class[]{}),
                     new RequestOptions(ResponseMode.GET_FIRST, 5000, true));
-            if (state != null) {
-                setState(state);
+            if (s != null) {
+                setState(s);
             }
         } catch (Exception e) {
             // TODO Auto-generated catch block
@@ -36,10 +36,16 @@ public class ServerBack implements AuctionService {
     }
 
     public void setState(ServerState state) {
+        System.out.println("clients: " + state.getClients().keySet());
+        System.out.println("items: " + state.getItems().keySet());
+        System.out.println("auctions: " + state.getAuctions().keySet());
         this.state = state;
     }
 
     public ServerState getState() {
+        System.out.println("clients: " + state.getClients().keySet());
+        System.out.println("items: " + state.getItems().keySet());
+        System.out.println("auctions: " + state.getAuctions().keySet());
         return this.state;
     }
 
@@ -80,7 +86,10 @@ public class ServerBack implements AuctionService {
     }
     
     public String generateItemId() {
-        Boolean unique = false;
+        String itemId = Integer.toString(state.getItemIdCounter());
+        return itemId;
+
+        /*Boolean unique = false;
         while (!unique) {
             String str = java.util.UUID.randomUUID().toString();
             String itemId = str.substring(0, 4);
@@ -94,7 +103,7 @@ public class ServerBack implements AuctionService {
             }
         }
         System.err.println("Encountered error while creating itemID.");
-        return null;
+        return null;*/
     }
 
     @Override
@@ -157,7 +166,9 @@ public class ServerBack implements AuctionService {
     }
 
     public String generateAuctionId() {
-        Boolean unique = false;
+        String auctionId = Integer.toString(state.getAuctionIdCounter());
+        return auctionId;
+        /*Boolean unique = false;
         while (!unique) {
             String str = java.util.UUID.randomUUID().toString();
             String auctionId = str.substring(0, 4);
@@ -171,7 +182,7 @@ public class ServerBack implements AuctionService {
             }
         }
         System.err.println("Encountered error while creating itemID.");
-        return null;
+        return null;*/
     }
 
     @Override
