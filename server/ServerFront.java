@@ -28,7 +28,6 @@ public class ServerFront implements AuctionService {
             channel.setDiscardOwnMessages(true);
             dispatcher = new RpcDispatcher(channel, this);
         } catch (Exception e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
@@ -43,7 +42,8 @@ public class ServerFront implements AuctionService {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        if(list == null || list.isEmpty()) throw new RemoteException();
+        if (list == null) throw new RemoteException();
+        if (list.isEmpty()) throw new RemoteException();
         Boolean ret = list.getFirst();
         for (Entry<Address, Rsp<Boolean>> entry : list.entrySet()) {
             if (!ret.equals(entry.getValue().getValue())) throw new RemoteException();
@@ -61,7 +61,8 @@ public class ServerFront implements AuctionService {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        if(list == null || list.isEmpty()) throw new RemoteException();
+        if (list == null) throw new RemoteException();
+        if (list.isEmpty()) throw new RemoteException();
         PublicKey ret = list.getFirst();
         for (Entry<Address, Rsp<PublicKey>> entry : list.entrySet()) {
             if (!ret.equals(entry.getValue().getValue())) throw new RemoteException();
@@ -79,7 +80,8 @@ public class ServerFront implements AuctionService {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        if(list == null || list.isEmpty()) throw new RemoteException();
+        if (list == null) throw new RemoteException();
+        if (list.isEmpty()) throw new RemoteException();
         ServerResponse ret = list.getFirst();
         for (Entry<Address, Rsp<ServerResponse>> entry : list.entrySet()) {
             if (!ret.equals(entry.getValue().getValue())) { 
@@ -99,7 +101,8 @@ public class ServerFront implements AuctionService {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        if(list == null || list.isEmpty()) throw new RemoteException();
+        if (list == null) throw new RemoteException();
+        if (list.isEmpty()) throw new RemoteException();
         ServerResponse ret = list.getFirst();
         for (Entry<Address, Rsp<ServerResponse>> entry : list.entrySet()) {
             if (!ret.equals(entry.getValue().getValue())) throw new RemoteException();
@@ -116,7 +119,8 @@ public class ServerFront implements AuctionService {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        if(list == null || list.isEmpty()) throw new RemoteException();
+        if (list == null) throw new RemoteException();
+        if (list.isEmpty()) throw new RemoteException();
         ServerResponse ret = list.getFirst();
         for (Entry<Address, Rsp<ServerResponse>> entry : list.entrySet()) {
             if (!ret.equals(entry.getValue().getValue())) throw new RemoteException();
@@ -133,7 +137,8 @@ public class ServerFront implements AuctionService {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        if(list == null || list.isEmpty()) throw new RemoteException();
+        if (list == null) throw new RemoteException();
+        if (list.isEmpty()) throw new RemoteException();
         ServerResponse ret = list.getFirst();
         for (Entry<Address, Rsp<ServerResponse>> entry : list.entrySet()) {
             if (!ret.equals(entry.getValue().getValue())) throw new RemoteException();
@@ -150,7 +155,8 @@ public class ServerFront implements AuctionService {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        if(list == null || list.isEmpty()) throw new RemoteException();
+        if (list == null) throw new RemoteException();
+        if (list.isEmpty()) throw new RemoteException();
         ServerResponse ret = list.getFirst();
         for (Entry<Address, Rsp<ServerResponse>> entry : list.entrySet()) {
             if (!ret.equals(entry.getValue().getValue())) throw new RemoteException();
@@ -167,7 +173,8 @@ public class ServerFront implements AuctionService {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        if(list == null || list.isEmpty()) throw new RemoteException();
+        if (list == null) throw new RemoteException();
+        if (list.isEmpty()) throw new RemoteException();
         ServerResponse ret = list.getFirst();
         for (Entry<Address, Rsp<ServerResponse>> entry : list.entrySet()) {
             if (!ret.equals(entry.getValue().getValue())) throw new RemoteException();
@@ -184,7 +191,8 @@ public class ServerFront implements AuctionService {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        if(list == null || list.isEmpty()) throw new RemoteException();
+        if (list == null) throw new RemoteException();
+        if (list.isEmpty()) throw new RemoteException();
         ServerResponse ret = list.getFirst();
         for (Entry<Address, Rsp<ServerResponse>> entry : list.entrySet()) {
             if (!ret.equals(entry.getValue().getValue())) throw new RemoteException();
@@ -201,7 +209,8 @@ public class ServerFront implements AuctionService {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        if(list == null || list.isEmpty()) throw new RemoteException();
+        if (list == null) throw new RemoteException();
+        if (list.isEmpty()) throw new RemoteException();
         ServerResponse ret = list.getFirst();
         for (Entry<Address, Rsp<ServerResponse>> entry : list.entrySet()) {
             if (!ret.equals(entry.getValue().getValue())) throw new RemoteException();
