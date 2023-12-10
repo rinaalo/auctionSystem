@@ -1,6 +1,9 @@
+import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.rmi.RemoteException;
 import java.rmi.registry.Registry;
@@ -35,36 +38,59 @@ public class ServerChannel extends ReceiverAdapter implements Runnable {
         System.out.println("** view: " + new_view);
     }
 
+    @Override
     public void receive(Message msg) {
+        System.out.println("new message!! new message!!");
         // getting updates
         synchronized(server.state) {
             try {
-                channel.getState(null, 10000);
+                InputStream targetStream = new ByteArrayInputStream(msg.getBuffer());
+                ServerState new_state = (ServerState) Util.objectFromStream(new DataInputStream(targetStream));
+                if (new_state.equals(server.state)) {
+                    // if new state is same as old state, do not do anything
+                } else {
+                    Address leader = channel.getView().getCoord();
+                    if (leader.equals(msg.getSrc())) {
+                        server.state = new_state;
+                        //channel.send(msg);
+                    }
+                    else {
+                        // if message not from leader, do not do anything
+                    }
+                }
             } catch (Exception e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
         }
+        System.out.println("Clients: " + server.state.getClients());
+        System.out.println("Auctions: " + server.state.getAuctions());
+        System.out.println("Items: " + server.state.getItems());
+        //System.out.println("Private key: " + server.state.getKeyPair().getPrivate());
+        //System.out.println("Public key: " + server.state.getKeyPair().getPublic());
     }
 
     public void getState(OutputStream output) throws Exception {
+        System.out.println("made it to get state");
         synchronized(server.state) {
             Util.objectToStream(server.state, new DataOutputStream(output));
         }
     }
 
     public void setState(InputStream input) throws Exception {
-        ServerState new_state;
-        new_state = (ServerState) Util.objectFromStream(new DataInputStream(input));
+        System.out.println("made it to set state");
+        ServerState new_state = (ServerState) Util.objectFromStream(new DataInputStream(input));
         synchronized(server.state) {
-            server.state.getAuctions().clear(); 
-            server.state.getItems().clear(); 
-            server.state.getClients().clear(); 
+            /*server.state.getAuctions().clear(); 
             server.state.getAuctions().putAll(new_state.getAuctions()); 
+
+            server.state.getItems().clear(); 
             server.state.getItems().putAll(new_state.getItems()); 
+
+            server.state.getClients().clear(); 
             server.state.getClients().putAll(new_state.getClients()); 
-            server.state.setKeyPair(new KeyPair(new_state.getKeyPair().getPublic(), new_state.getKeyPair().getPrivate())); 
-            //server.state = new_state;
+
+            server.state.setKeyPair(new KeyPair(new_state.getKeyPair().getPublic(), new_state.getKeyPair().getPrivate()));*/
+            server.state = new_state;
         }
     }
 
@@ -91,21 +117,7 @@ public class ServerChannel extends ReceiverAdapter implements Runnable {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
                 }
-            } else { 
-                try {
-                    System.out.println("not leader");
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                } 
-            } try {
-                    System.out.println("CLIENT IDS: " + server.state.getClients().keySet());
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                } 
+            }
         }
     }
 
@@ -115,7 +127,7 @@ public class ServerChannel extends ReceiverAdapter implements Runnable {
             channel = new JChannel();
             channel.setReceiver(this);
             channel.connect("AuctionCluster");
-            channel.getState(null, 10000);
+            channel.getState(null, 5000);
             currentAddress = channel.getAddress();
         } catch (Exception e) {
             // TODO Auto-generated catch block

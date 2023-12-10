@@ -1,4 +1,6 @@
-public class Bid {
+import java.io.Serializable;
+
+public class Bid implements Serializable {
     private ClientAccount client;
     private int offer;
     public Bid(ClientAccount client, int bid) {

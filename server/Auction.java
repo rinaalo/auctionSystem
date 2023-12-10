@@ -1,5 +1,6 @@
+import java.io.Serializable;
 
-public abstract class Auction {
+public abstract class Auction implements Serializable{
     private String auctionId;
     private Boolean ongoing;
     private Boolean isSuccess;

@@ -1,5 +1,6 @@
+import java.io.Serializable;
 
-public class AuctionItem {
+public class AuctionItem implements Serializable {
     
     // item details
     private String itemId;

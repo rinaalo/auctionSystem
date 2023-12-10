@@ -1,7 +1,8 @@
+import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 
-public class ClientAccount {
+public class ClientAccount implements Serializable {
     private String clientId;
     private String email;
     private String password;

@@ -5,7 +5,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Hashtable;
 import java.util.Map;
 
-public class ServerState implements Serializable{
+public class ServerState implements Serializable {
     // auction id, auction
     private Map<String, Auction> auctions;
     // item id, item

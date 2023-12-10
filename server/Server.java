@@ -11,7 +11,6 @@ import org.jgroups.Message;
 public class Server implements AuctionService {
     
     ServerState state = new ServerState();
-    Message msg = new Message(null, "update");
     ServerChannel replica;
     
     public Server() {
@@ -25,6 +24,7 @@ public class Server implements AuctionService {
         }
         ClientAccount client = new ClientAccount(name, email, password);
         state.addClients(name, client);
+        Message msg = new Message(null, null, state);
         replica.sendMessage(msg);
         System.out.println("Client " + name + " has been added to the system.");
         return true;
@@ -51,6 +51,7 @@ public class Server implements AuctionService {
         state.addItems(itemId, newItem);
         state.getClients().get(clientId).addItem(newItem);
         newItem.setSeller(clientId);
+        Message msg = new Message(null, null, state);
         replica.sendMessage(msg);
         System.out.println("Item " + itemId + " has been added to the system.");
         return new ServerResponse("Item has been added to the system. Item details:\n" + itemDetails(itemId, clientId), state.getKeyPair().getPrivate());
@@ -129,6 +130,7 @@ public class Server implements AuctionService {
             default:
                 return new ServerResponse("Can not create action.\nAuction ID: " + auctionId + "\n", state.getKeyPair().getPrivate());
         }
+        Message msg = new Message(null, null, state);
         replica.sendMessage(msg);
         System.out.println(auctionType.toString() + " Auction " + auctionId + " has been created by " + clientId);
         return new ServerResponse(auctionType.toString() + " Auction has been created.\nAuction ID: " + auctionId + "\n", state.getKeyPair().getPrivate());
@@ -167,6 +169,7 @@ public class Server implements AuctionService {
             ret = "This auction does not belong to you.\n";
         }
         else ret = auction.closeAuction();
+        Message msg = new Message(null, null, state);
         replica.sendMessage(msg);
         return new ServerResponse(ret, state.getKeyPair().getPrivate());
     }
@@ -194,6 +197,7 @@ public class Server implements AuctionService {
             ret = "Auction " + auctionId + " is closed.\n";
         }
         else ret = auction.bid(offer, state.getClients().get(clientId));
+        Message msg = new Message(null, null, state);
         replica.sendMessage(msg);
         return new ServerResponse(ret, state.getKeyPair().getPrivate());
     }
@@ -238,6 +242,7 @@ public class Server implements AuctionService {
             item.setInAuction(true);
             ret = auction.addItemToAuction(item, clientId);
         }
+        Message msg = new Message(null, null, state);
         replica.sendMessage(msg);
         return new ServerResponse(ret, state.getKeyPair().getPrivate());
     }
