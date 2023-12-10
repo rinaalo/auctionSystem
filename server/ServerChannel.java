@@ -2,12 +2,9 @@ import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.rmi.RemoteException;
 import java.rmi.registry.Registry;
-import java.security.KeyPair;
 
 import org.jgroups.Address;
 import org.jgroups.JChannel;
@@ -62,34 +59,20 @@ public class ServerChannel extends ReceiverAdapter implements Runnable {
                 e.printStackTrace();
             }
         }
-        System.out.println("Clients: " + server.state.getClients());
-        System.out.println("Auctions: " + server.state.getAuctions());
-        System.out.println("Items: " + server.state.getItems());
-        //System.out.println("Private key: " + server.state.getKeyPair().getPrivate());
-        //System.out.println("Public key: " + server.state.getKeyPair().getPublic());
+        System.out.println("Clients: " + server.state.getClients().keySet());
+        System.out.println("Auctions: " + server.state.getAuctions().keySet());
+        System.out.println("Items: " + server.state.getItems().keySet());
     }
 
     public void getState(OutputStream output) throws Exception {
-        System.out.println("made it to get state");
         synchronized(server.state) {
             Util.objectToStream(server.state, new DataOutputStream(output));
         }
     }
 
     public void setState(InputStream input) throws Exception {
-        System.out.println("made it to set state");
         ServerState new_state = (ServerState) Util.objectFromStream(new DataInputStream(input));
         synchronized(server.state) {
-            /*server.state.getAuctions().clear(); 
-            server.state.getAuctions().putAll(new_state.getAuctions()); 
-
-            server.state.getItems().clear(); 
-            server.state.getItems().putAll(new_state.getItems()); 
-
-            server.state.getClients().clear(); 
-            server.state.getClients().putAll(new_state.getClients()); 
-
-            server.state.setKeyPair(new KeyPair(new_state.getKeyPair().getPublic(), new_state.getKeyPair().getPrivate()));*/
             server.state = new_state;
         }
     }

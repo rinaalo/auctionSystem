@@ -1,7 +1,15 @@
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.util.Scanner;
 
 public class Buyer extends ClientManager {
+
+    private Client client;
+
+    public Buyer(Client client) {
+        super(client);
+        this.client = client;
+    }
 
     @Override
     public void showMenu() {
@@ -67,7 +75,13 @@ public class Buyer extends ClientManager {
                         ServerResponse response = server.getAuctions();
                         System.out.println(verifySignature(response));
                     } catch (RemoteException e) {
-                        System.err.println("Request could not be handled due to network problems.");
+                        System.err.println("Request could not be handled due to network problems.\n");
+                        System.err.println("Reconnecting Client...\n");
+                        try {
+                            server = client.connectClient();
+                        } catch (RemoteException | NotBoundException e1) {
+                            System.out.println("Could not connect.");
+                        }
                         continue;
                     }
                     break;
@@ -81,7 +95,13 @@ public class Buyer extends ClientManager {
                         ServerResponse response = server.getItemsInAuction(tokens[1]);
                         System.out.println(verifySignature(response));
                     } catch (RemoteException e) {
-                        System.err.println("Request could not be handled due to network problems.");
+                        System.err.println("Request could not be handled due to network problems.\n");
+                        System.err.println("Reconnecting Client...\n");
+                        try {
+                            server = client.connectClient();
+                        } catch (RemoteException | NotBoundException e1) {
+                            System.out.println("Could not connect.");
+                        }
                         continue;
                     }
                     break;
@@ -100,7 +120,13 @@ public class Buyer extends ClientManager {
                         System.err.println("Invalid bid");
                         continue;
                     } catch (RemoteException e) {
-                        System.err.println("Request could not be handled due to network problems.");
+                        System.err.println("Request could not be handled due to network problems.\n");
+                        System.err.println("Reconnecting Client...\n");
+                        try {
+                            server = client.connectClient();
+                        } catch (RemoteException | NotBoundException e1) {
+                            System.out.println("Could not connect.");
+                        }
                         continue;
                     }
                     break;
@@ -128,7 +154,13 @@ public class Buyer extends ClientManager {
                                 break;
                         }
                     } catch (RemoteException e) {
-                        System.err.println("Request could not be handled due to network problems.");
+                        System.err.println("Request could not be handled due to network problems.\n");
+                        System.err.println("Reconnecting Client...\n");
+                        try {
+                            server = client.connectClient();
+                        } catch (RemoteException | NotBoundException e1) {
+                            System.out.println("Could not connect.");
+                        }
                         continue;
                     }
                     break;
@@ -145,7 +177,13 @@ public class Buyer extends ClientManager {
                         System.err.println("Invalid ID");
                         continue;
                     } catch (RemoteException e) {
-                        System.err.println("Request could not be handled due to network problems.");
+                        System.err.println("Request could not be handled due to network problems.\n");
+                        System.err.println("Reconnecting Client...\n");
+                        try {
+                            server = client.connectClient();
+                        } catch (RemoteException | NotBoundException e1) {
+                            System.out.println("Could not connect.");
+                        }
                         continue;
                     }
                     break;
