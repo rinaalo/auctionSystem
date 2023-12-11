@@ -34,21 +34,6 @@ public class ServerFrontend implements AuctionService {
         }
     }
 
-    /*public DataState getState() {
-        DataState s = null;
-        try {
-            s = dispatcher.callRemoteMethod(
-                    channel.getView().getMembers().get(1),
-                    new MethodCall("getState", new Object[]{}, new Class[]{}),
-                    new RequestOptions(ResponseMode.GET_FIRST, 5000, true)
-                    );
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return s;
-    }*/
-
-
     @Override
     public Boolean addClient(String clientId, String email, String password) throws RemoteException {
         RspList<Boolean> list = null;

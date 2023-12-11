@@ -26,7 +26,6 @@ public class ServerReplica implements AuctionService {
         try {
             stateChannel = new JChannel();
             stateChannel.connect("StateCluster");
-            //stateChannel.setDiscardOwnMessages(true);
             stateDispatcher = new RpcDispatcher(stateChannel, this);
 
             DataState s = stateDispatcher.callRemoteMethod(
@@ -40,7 +39,6 @@ public class ServerReplica implements AuctionService {
                 
             channel = new JChannel();            
             channel.connect("AuctionCluster");
-            //channel.setDiscardOwnMessages(true);
             dispatcher = new RpcDispatcher(channel, this);
 
         } catch (Exception e) {
