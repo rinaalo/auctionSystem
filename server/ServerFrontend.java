@@ -6,6 +6,7 @@ import java.rmi.server.UnicastRemoteObject;
 import java.security.PublicKey;
 
 import java.util.Map.Entry;
+import java.util.logging.LogManager;
 
 import org.jgroups.Address;
 import org.jgroups.JChannel;
@@ -22,18 +23,18 @@ public class ServerFrontend implements AuctionService {
     private RpcDispatcher dispatcher;
 
     public ServerFrontend() {
+        LogManager.getLogManager().reset();
         try {
             channel = new JChannel();
             channel.connect("AuctionCluster");
             channel.setDiscardOwnMessages(true);
             dispatcher = new RpcDispatcher(channel, this);
-            
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public DataState getState() {
+    /*public DataState getState() {
         DataState s = null;
         try {
             s = dispatcher.callRemoteMethod(
@@ -42,11 +43,10 @@ public class ServerFrontend implements AuctionService {
                     new RequestOptions(ResponseMode.GET_FIRST, 5000, true)
                     );
         } catch (Exception e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
         return s;
-    }
+    }*/
 
 
     @Override
@@ -58,7 +58,7 @@ public class ServerFrontend implements AuctionService {
                 new MethodCall("addClient",
                     new Object[]{clientId, email, password},
                     new Class[]{clientId.getClass(), email.getClass(), password.getClass()}),
-                new RequestOptions(ResponseMode.GET_ALL, 5000, false)
+                new RequestOptions(ResponseMode.GET_ALL, 3000, false)
                 );
         } catch (Exception e) {
             e.printStackTrace();
@@ -81,7 +81,7 @@ public class ServerFrontend implements AuctionService {
                 new MethodCall("verifyClient",
                     new Object[]{name, password},
                     new Class[]{name.getClass(), password.getClass()}),
-                new RequestOptions(ResponseMode.GET_ALL, 5000, false)
+                new RequestOptions(ResponseMode.GET_ALL, 3000, false)
                 );
         } catch (Exception e) {
             e.printStackTrace();
@@ -104,7 +104,7 @@ public class ServerFrontend implements AuctionService {
                 new MethodCall("putItem",
                     new Object[]{itemTitle, used, description, clientId},
                     new Class[]{itemTitle.getClass(), used.getClass(), description.getClass(), clientId.getClass()}),
-                new RequestOptions(ResponseMode.GET_ALL, 5000, false)
+                new RequestOptions(ResponseMode.GET_ALL, 3000, false)
                 );
         } catch (Exception e) {
             e.printStackTrace();
@@ -129,7 +129,7 @@ public class ServerFrontend implements AuctionService {
                 new MethodCall("showClientsBelongings",
                     new Object[]{clientId},
                     new Class[]{clientId.getClass()}),
-                new RequestOptions(ResponseMode.GET_ALL, 5000, false)
+                new RequestOptions(ResponseMode.GET_ALL, 3000, false)
                 );
         } catch (Exception e) {
             e.printStackTrace();
@@ -151,7 +151,7 @@ public class ServerFrontend implements AuctionService {
                 new MethodCall("createAuction",
                     new Object[]{clientId, title, auctionType}, 
                     new Class[]{clientId.getClass(), title.getClass(), auctionType.getClass()}), 
-                new RequestOptions(ResponseMode.GET_ALL, 5000, false)
+                new RequestOptions(ResponseMode.GET_ALL, 3000, false)
                 );
         } catch (Exception e) {
             e.printStackTrace();
@@ -173,7 +173,7 @@ public class ServerFrontend implements AuctionService {
                 new MethodCall("closeAuction",
                     new Object[]{auctionId, clientId},
                     new Class[]{auctionId.getClass(), clientId.getClass()}), 
-                new RequestOptions(ResponseMode.GET_ALL, 5000, false)
+                new RequestOptions(ResponseMode.GET_ALL, 3000, false)
                 );
         } catch (Exception e) {
             e.printStackTrace();
@@ -195,7 +195,7 @@ public class ServerFrontend implements AuctionService {
                 new MethodCall("bid",
                     new Object[]{clientId, auctionId, bid}, 
                     new Class[]{clientId.getClass(), auctionId.getClass(), int.class}), 
-                new RequestOptions(ResponseMode.GET_ALL, 5000, false)
+                new RequestOptions(ResponseMode.GET_ALL, 3000, false)
                 );
         } catch (Exception e) {
             e.printStackTrace();
@@ -217,7 +217,7 @@ public class ServerFrontend implements AuctionService {
                 new MethodCall("getAuctions",
                     new Object[]{}, 
                     new Class[]{}), 
-                new RequestOptions(ResponseMode.GET_ALL, 5000, false)
+                new RequestOptions(ResponseMode.GET_ALL, 3000, false)
                 );
         } catch (Exception e) {
             e.printStackTrace();
@@ -239,7 +239,7 @@ public class ServerFrontend implements AuctionService {
                 new MethodCall("addItemToAuction",
                     new Object[]{itemId, auctionId, reservedPrice, startingPrice, clientId}, 
                     new Class[]{itemId.getClass(), auctionId.getClass(), int.class, int.class, clientId.getClass()}), 
-                new RequestOptions(ResponseMode.GET_ALL, 5000, false)
+                new RequestOptions(ResponseMode.GET_ALL, 3000, false)
                 );
         } catch (Exception e) {
             e.printStackTrace();
@@ -261,7 +261,7 @@ public class ServerFrontend implements AuctionService {
                 new MethodCall("getItemsInAuction",
                     new Object[]{auctionId}, 
                     new Class[]{auctionId.getClass()}), 
-                new RequestOptions(ResponseMode.GET_ALL, 5000, false)
+                new RequestOptions(ResponseMode.GET_ALL, 3000, false)
                 );
         } catch (Exception e) {
             e.printStackTrace();

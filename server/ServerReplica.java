@@ -1,6 +1,7 @@
 import java.rmi.RemoteException;
 import java.security.PublicKey;
 import java.util.List;
+import java.util.logging.LogManager;
 
 import org.jgroups.JChannel;
 import org.jgroups.blocks.MethodCall;
@@ -14,22 +15,34 @@ public class ServerReplica implements AuctionService {
     private DataState state = new DataState();
 
     private JChannel channel;
+    private JChannel stateChannel;
+
     private RpcDispatcher dispatcher;
+    private RpcDispatcher stateDispatcher;
 
     public ServerReplica() {
         super();
+        LogManager.getLogManager().reset();
         try {
-            channel = new JChannel();
-            channel.connect("AuctionCluster");
-            dispatcher = new RpcDispatcher(channel, this);
-            DataState s = dispatcher.callRemoteMethod(
-                channel.getView().getCoord(),
+            stateChannel = new JChannel();
+            stateChannel.connect("StateCluster");
+            //stateChannel.setDiscardOwnMessages(true);
+            stateDispatcher = new RpcDispatcher(stateChannel, this);
+
+            DataState s = stateDispatcher.callRemoteMethod(
+                stateChannel.getView().getCoord(),
                 new MethodCall("getState", new Object[]{}, new Class[]{}),
                 new RequestOptions(ResponseMode.GET_FIRST, 5000, true)
                 );
             if (s != null) {
                 setState(s);
             }
+                
+            channel = new JChannel();            
+            channel.connect("AuctionCluster");
+            //channel.setDiscardOwnMessages(true);
+            dispatcher = new RpcDispatcher(channel, this);
+
         } catch (Exception e) {
             e.printStackTrace();
         }
