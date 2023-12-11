@@ -16,29 +16,50 @@ import org.jgroups.blocks.RpcDispatcher;
 import org.jgroups.util.Rsp;
 import org.jgroups.util.RspList;
 
-public class ServerFront implements AuctionService {
+public class ServerFrontend implements AuctionService {
 
     private JChannel channel;
     private RpcDispatcher dispatcher;
 
-    public ServerFront() {
+    public ServerFrontend() {
         try {
             channel = new JChannel();
             channel.connect("AuctionCluster");
             channel.setDiscardOwnMessages(true);
             dispatcher = new RpcDispatcher(channel, this);
+            
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
+    public DataState getState() {
+        DataState s = null;
+        try {
+            s = dispatcher.callRemoteMethod(
+                    channel.getView().getMembers().get(1),
+                    new MethodCall("getState", new Object[]{}, new Class[]{}),
+                    new RequestOptions(ResponseMode.GET_FIRST, 5000, true)
+                    );
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return s;
+    }
+
+
     @Override
     public Boolean addClient(String clientId, String email, String password) throws RemoteException {
         RspList<Boolean> list = null;
         try {
-            list = dispatcher.callRemoteMethods(null, new MethodCall("addClient", new Object[]{clientId, email, password}, 
-                    new Class[]{clientId.getClass(), email.getClass(), password.getClass()}), 
-                    new RequestOptions(ResponseMode.GET_ALL, 5000, false));
+            list = dispatcher.callRemoteMethods(
+                null,
+                new MethodCall("addClient",
+                    new Object[]{clientId, email, password},
+                    new Class[]{clientId.getClass(), email.getClass(), password.getClass()}),
+                new RequestOptions(ResponseMode.GET_ALL, 5000, false)
+                );
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -55,9 +76,13 @@ public class ServerFront implements AuctionService {
     public PublicKey verifyClient(String name, String password) throws RemoteException {
         RspList<PublicKey> list = null;
         try {
-            list = dispatcher.callRemoteMethods(null, new MethodCall("verifyClient", new Object[]{name, password}, 
-                    new Class[]{name.getClass(), password.getClass()}), 
-                    new RequestOptions(ResponseMode.GET_ALL, 5000, false));
+            list = dispatcher.callRemoteMethods(
+                null,
+                new MethodCall("verifyClient",
+                    new Object[]{name, password},
+                    new Class[]{name.getClass(), password.getClass()}),
+                new RequestOptions(ResponseMode.GET_ALL, 5000, false)
+                );
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -74,9 +99,13 @@ public class ServerFront implements AuctionService {
     public ServerResponse putItem(String itemTitle, Boolean used, String description, String clientId) throws RemoteException {
         RspList<ServerResponse> list = null;
         try {
-            list = dispatcher.callRemoteMethods(null, new MethodCall("putItem", new Object[]{itemTitle, used, description, clientId}, 
-                    new Class[]{itemTitle.getClass(), used.getClass(), description.getClass(), clientId.getClass()}), 
-                    new RequestOptions(ResponseMode.GET_ALL, 5000, false));
+            list = dispatcher.callRemoteMethods(
+                null,
+                new MethodCall("putItem",
+                    new Object[]{itemTitle, used, description, clientId},
+                    new Class[]{itemTitle.getClass(), used.getClass(), description.getClass(), clientId.getClass()}),
+                new RequestOptions(ResponseMode.GET_ALL, 5000, false)
+                );
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -95,9 +124,13 @@ public class ServerFront implements AuctionService {
     public ServerResponse showClientsBelongings(String clientId) throws RemoteException {
         RspList<ServerResponse> list = null;
         try {
-            list = dispatcher.callRemoteMethods(null, new MethodCall("showClientsBelongings", new Object[]{clientId}, 
-                    new Class[]{clientId.getClass()}), 
-                    new RequestOptions(ResponseMode.GET_ALL, 5000, false));
+            list = dispatcher.callRemoteMethods(
+                null,
+                new MethodCall("showClientsBelongings",
+                    new Object[]{clientId},
+                    new Class[]{clientId.getClass()}),
+                new RequestOptions(ResponseMode.GET_ALL, 5000, false)
+                );
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -113,9 +146,13 @@ public class ServerFront implements AuctionService {
     public ServerResponse createAuction(String clientId, String title, AuctionType auctionType) throws RemoteException {
         RspList<ServerResponse> list = null;
         try {
-            list = dispatcher.callRemoteMethods(null, new MethodCall("createAuction", new Object[]{clientId, title, auctionType}, 
+            list = dispatcher.callRemoteMethods(
+                null,
+                new MethodCall("createAuction",
+                    new Object[]{clientId, title, auctionType}, 
                     new Class[]{clientId.getClass(), title.getClass(), auctionType.getClass()}), 
-                    new RequestOptions(ResponseMode.GET_ALL, 5000, false));
+                new RequestOptions(ResponseMode.GET_ALL, 5000, false)
+                );
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -131,9 +168,13 @@ public class ServerFront implements AuctionService {
     public ServerResponse closeAuction(String auctionId, String clientId) throws RemoteException {
         RspList<ServerResponse> list = null;
         try {
-            list = dispatcher.callRemoteMethods(null, new MethodCall("closeAuction", new Object[]{auctionId, clientId}, 
+            list = dispatcher.callRemoteMethods(
+                null,
+                new MethodCall("closeAuction",
+                    new Object[]{auctionId, clientId},
                     new Class[]{auctionId.getClass(), clientId.getClass()}), 
-                    new RequestOptions(ResponseMode.GET_ALL, 5000, false));
+                new RequestOptions(ResponseMode.GET_ALL, 5000, false)
+                );
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -149,9 +190,13 @@ public class ServerFront implements AuctionService {
     public ServerResponse bid(String clientId, String auctionId, int bid) throws RemoteException {
         RspList<ServerResponse> list = null;
         try {
-            list = dispatcher.callRemoteMethods(null, new MethodCall("bid", new Object[]{clientId, auctionId, bid}, 
+            list = dispatcher.callRemoteMethods(
+                null,
+                new MethodCall("bid",
+                    new Object[]{clientId, auctionId, bid}, 
                     new Class[]{clientId.getClass(), auctionId.getClass(), int.class}), 
-                    new RequestOptions(ResponseMode.GET_ALL, 5000, false));
+                new RequestOptions(ResponseMode.GET_ALL, 5000, false)
+                );
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -167,9 +212,13 @@ public class ServerFront implements AuctionService {
     public ServerResponse getAuctions() throws RemoteException {
         RspList<ServerResponse> list = null;
         try {
-            list = dispatcher.callRemoteMethods(null, new MethodCall("getAuctions", new Object[]{}, 
+            list = dispatcher.callRemoteMethods(
+                null,
+                new MethodCall("getAuctions",
+                    new Object[]{}, 
                     new Class[]{}), 
-                    new RequestOptions(ResponseMode.GET_ALL, 5000, false));
+                new RequestOptions(ResponseMode.GET_ALL, 5000, false)
+                );
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -185,9 +234,13 @@ public class ServerFront implements AuctionService {
     public ServerResponse addItemToAuction(String itemId, String auctionId, int reservedPrice, int startingPrice, String clientId) throws RemoteException {
         RspList<ServerResponse> list = null;
         try {
-            list = dispatcher.callRemoteMethods(null, new MethodCall("addItemToAuction", new Object[]{itemId, auctionId, reservedPrice, startingPrice, clientId}, 
+            list = dispatcher.callRemoteMethods(
+                null,
+                new MethodCall("addItemToAuction",
+                    new Object[]{itemId, auctionId, reservedPrice, startingPrice, clientId}, 
                     new Class[]{itemId.getClass(), auctionId.getClass(), int.class, int.class, clientId.getClass()}), 
-                    new RequestOptions(ResponseMode.GET_ALL, 5000, false));
+                new RequestOptions(ResponseMode.GET_ALL, 5000, false)
+                );
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -203,9 +256,13 @@ public class ServerFront implements AuctionService {
     public ServerResponse getItemsInAuction(String auctionId) throws RemoteException {
         RspList<ServerResponse> list = null;
         try {
-            list = dispatcher.callRemoteMethods(null, new MethodCall("getItemsInAuction", new Object[]{auctionId}, 
+            list = dispatcher.callRemoteMethods(
+                null,
+                new MethodCall("getItemsInAuction",
+                    new Object[]{auctionId}, 
                     new Class[]{auctionId.getClass()}), 
-                    new RequestOptions(ResponseMode.GET_ALL, 5000, false));
+                new RequestOptions(ResponseMode.GET_ALL, 5000, false)
+                );
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -220,10 +277,11 @@ public class ServerFront implements AuctionService {
 
     public static void main(String[] args) {
         try {
-            ServerFront frontEnd = new ServerFront();
+            ServerFrontend frontEnd = new ServerFrontend();
+            String name = "myserver";
             Remote stub = (AuctionService) UnicastRemoteObject.exportObject(frontEnd, 0);
             Registry registry = LocateRegistry.getRegistry();
-            registry.rebind("myserver",(AuctionService) stub);
+            registry.rebind(name, (AuctionService) stub);
         } catch (Exception e) {
             e.printStackTrace();
         }

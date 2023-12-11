@@ -5,7 +5,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Hashtable;
 import java.util.Map;
 
-public class ServerState implements Serializable {
+public class DataState implements Serializable {
     // auction id, auction
     private Map<String, Auction> auctions;
     // item id, item
@@ -18,7 +18,7 @@ public class ServerState implements Serializable {
     private int itemIdCounter;
     private int auctionIdCounter;
 
-    public ServerState() {
+    public DataState() {
         auctions = new Hashtable<>();
         items = new Hashtable<>();
         clients = new Hashtable<>();

@@ -9,40 +9,40 @@ import org.jgroups.blocks.ResponseMode;
 import org.jgroups.blocks.RpcDispatcher;
 
 
-public class ServerBack implements AuctionService {
+public class ServerReplica implements AuctionService {
     
-    private ServerState state = new ServerState();;
+    private DataState state = new DataState();
 
     private JChannel channel;
     private RpcDispatcher dispatcher;
 
-    
-    public ServerBack() {
+    public ServerReplica() {
         super();
         try {
             channel = new JChannel();
             channel.connect("AuctionCluster");
             dispatcher = new RpcDispatcher(channel, this);
-            ServerState s = dispatcher.callRemoteMethod(channel.getView().getCoord(), 
-                    new MethodCall("getState", new Object[]{}, new Class[]{}),
-                    new RequestOptions(ResponseMode.GET_FIRST, 5000, true));
+            DataState s = dispatcher.callRemoteMethod(
+                channel.getView().getCoord(),
+                new MethodCall("getState", new Object[]{}, new Class[]{}),
+                new RequestOptions(ResponseMode.GET_FIRST, 5000, true)
+                );
             if (s != null) {
                 setState(s);
             }
         } catch (Exception e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
 
-    public void setState(ServerState state) {
+    public void setState(DataState state) {
         System.out.println("clients: " + state.getClients().keySet());
         System.out.println("items: " + state.getItems().keySet());
         System.out.println("auctions: " + state.getAuctions().keySet());
         this.state = state;
     }
 
-    public ServerState getState() {
+    public DataState getState() {
         System.out.println("clients: " + state.getClients().keySet());
         System.out.println("items: " + state.getItems().keySet());
         System.out.println("auctions: " + state.getAuctions().keySet());
@@ -303,6 +303,6 @@ public class ServerBack implements AuctionService {
     }
 
     public static void main(String[] args) {
-        new ServerBack();
+        new ServerReplica();
     }
 }
